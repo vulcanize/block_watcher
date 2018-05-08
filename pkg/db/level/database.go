@@ -1,18 +1,23 @@
 package level
 
-// Implements Database interface for LevelDB
-type LevelDatabase struct {
-	Reader
+type Database struct {
+	reader
 }
 
-func NewLevelDatabase(ldbReader Reader) *LevelDatabase {
-	return &LevelDatabase{
-		Reader: ldbReader,
+func NewLevelDatabase(ldbReader reader) *Database {
+	return &Database{
+		reader: ldbReader,
 	}
 }
 
-func (l LevelDatabase) Get(blockNumber int64) ([]byte, error) {
+func (l Database) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
 	n := uint64(blockNumber)
-	blockHash := l.Reader.GetCanonicalHash(n)
-	return l.Reader.GetHeaderRLP(blockHash, n), nil
+	h := l.reader.GetCanonicalHash(n)
+	return l.reader.GetBodyRLP(h, n), nil
+}
+
+func (l Database) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
+	n := uint64(blockNumber)
+	h := l.reader.GetCanonicalHash(n)
+	return l.reader.GetHeaderRLP(h, n), nil
 }

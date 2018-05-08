@@ -1,11 +1,11 @@
 package test_helpers
 
 type MockRocksDatabaseReader struct {
+	GetBlockHashCalled   bool
 	GetBlockHashErr      error
+	GetBlockHeaderCalled bool
 	GetBlockHeaderErr    error
 	OpenDatabaseCalled   bool
-	GetBlockHashCalled   bool
-	GetBlockHeaderCalled bool
 	PassedBlockHashKey   []byte
 	PassedBlockHeaderKey []byte
 	ReturnHashBytes      []byte
@@ -14,11 +14,11 @@ type MockRocksDatabaseReader struct {
 
 func NewMockRocksDatabaseReader() *MockRocksDatabaseReader {
 	return &MockRocksDatabaseReader{
+		GetBlockHashCalled:   false,
 		GetBlockHashErr:      nil,
+		GetBlockHeaderCalled: false,
 		GetBlockHeaderErr:    nil,
 		OpenDatabaseCalled:   false,
-		GetBlockHashCalled:   false,
-		GetBlockHeaderCalled: false,
 		PassedBlockHashKey:   nil,
 		PassedBlockHeaderKey: nil,
 		ReturnHashBytes:      nil,
@@ -45,19 +45,13 @@ func (mrdbr *MockRocksDatabaseReader) SetGetHeaderError(err error) {
 func (mrdbr *MockRocksDatabaseReader) GetBlockHash(key []byte) ([]byte, error) {
 	mrdbr.GetBlockHashCalled = true
 	mrdbr.PassedBlockHashKey = key
-	if mrdbr.GetBlockHashErr != nil {
-		return nil, mrdbr.GetBlockHashErr
-	}
-	return mrdbr.ReturnHashBytes, nil
+	return mrdbr.ReturnHashBytes, mrdbr.GetBlockHashErr
 }
 
 func (mrdbr *MockRocksDatabaseReader) GetBlockHeader(key []byte) ([]byte, error) {
 	mrdbr.GetBlockHeaderCalled = true
 	mrdbr.PassedBlockHeaderKey = key
-	if mrdbr.GetBlockHeaderErr != nil {
-		return nil, mrdbr.GetBlockHeaderErr
-	}
-	return mrdbr.ReturnHeaderBytes, nil
+	return mrdbr.ReturnHeaderBytes, mrdbr.GetBlockHeaderErr
 }
 
 func (mrdbr *MockRocksDatabaseReader) OpenDatabaseForReadOnlyColumnFamilies(name string) error {

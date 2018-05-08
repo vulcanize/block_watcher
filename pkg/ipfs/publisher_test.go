@@ -23,7 +23,7 @@ var _ = Describe("IPFS publisher", func() {
 
 	It("returns error if dag put fails", func() {
 		mockDagPutter := test_helpers.NewMockDagPutter()
-		fakeError := errors.New("Failed")
+		fakeError := errors.New("failed")
 		mockDagPutter.SetError(fakeError)
 		publisher := ipfs.NewIpfsPublisher(mockDagPutter)
 

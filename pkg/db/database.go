@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 )
 
-var ErrNoSuchDb = errors.New("No such database")
+var ErrNoSuchDb = errors.New("no such database")
 
 type ReadError struct {
 	msg string
@@ -21,7 +21,8 @@ func (re ReadError) Error() string {
 }
 
 type Database interface {
-	Get(blockNumber int64) ([]byte, error)
+	GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error)
+	GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
 }
 
 func CreateDatabase(config DatabaseConfig) (Database, error) {
@@ -35,7 +36,7 @@ func CreateDatabase(config DatabaseConfig) (Database, error) {
 		levelDB := level.NewLevelDatabase(levelDBReader)
 		return levelDB, nil
 	case Rocks:
-		decoder := rocks.EthBlockHeaderDecompressor{}
+		decoder := rocks.EthBlockDecompressor{}
 		reader := rocks.RDBReader{}
 		reader.OpenDatabaseForReadOnlyColumnFamilies(config.Path)
 		rocksDb := rocks.NewRocksDatabase(decoder, &reader)

@@ -15,47 +15,36 @@
 package cmd
 
 import (
-	"log"
-
-	"github.com/spf13/cobra"
-
-	"github.com/8thlight/block_watcher/pkg"
 	"github.com/8thlight/block_watcher/pkg/db"
 	"github.com/8thlight/block_watcher/pkg/ipfs"
-	"github.com/8thlight/block_watcher/pkg/ipfs/eth_block_header"
+	"github.com/8thlight/block_watcher/pkg/ipfs/eth_block_transactions"
+	"github.com/8thlight/block_watcher/pkg/transformers"
+	"github.com/spf13/cobra"
+	"log"
 )
 
-// createIpldForBlockCmd represents the createIpldForBlock command
-var createIpldForBlockCmd = &cobra.Command{
-	Use:   "createIpldForBlock",
-	Short: "Create an IPLD object for a block.",
-	Long: `Create an IPLD object for a block.
+// createIpldsForBlockTransactionsCmd represents the createIpldsForBlockTransactions command
+var createIpldsForBlockTransactionsCmd = &cobra.Command{
+	Use:   "createIpldsForBlockTransactions",
+	Short: "Create IPLDs for every transaction in a block",
+	Long: `Create an IPLD for every transaction in a block. For example:
 
-e.g. ./block_watcher createIpldForBlock -b 1234567
+./block_watcher createIpldsForBlockTransactions --config environments/public.toml --block-number 5000000
 
-Under the hood, the command fetches the block header RLP data from LevelDB and
-puts it in IPFS, converting the data as an 'eth-block'`,
+The block number specifies the block for which to create transaction IPLDs, and is required.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		createIpldForBlock()
+		createIpldsForBlockTransactions()
 	},
 }
 
-var blockNumber int64
-
 func init() {
-	rootCmd.AddCommand(createIpldForBlockCmd)
-	createIpldForBlockCmd.Flags().Int64VarP(&blockNumber, "block-number", "b", 0, "Create IPLD for this block")
-	createIpldForBlockCmd.Flags().BoolVarP(&useParity, "parity", "p", false, "Use Parity's RocksDB instead of Geth's LevelDB")
+	rootCmd.AddCommand(createIpldsForBlockTransactionsCmd)
+	createIpldsForBlockTransactionsCmd.Flags().Int64VarP(&blockNumber, "block-number", "b", 0, "Create IPLD for this block.")
 }
 
-func createIpldForBlock() {
+func createIpldsForBlockTransactions() {
 	// init eth db
-	var ethDBConfig db.DatabaseConfig
-	if useParity {
-		ethDBConfig = db.CreateDatabaseConfig(db.Rocks, rocksDbPath)
-	} else {
-		ethDBConfig = db.CreateDatabaseConfig(db.Level, levelDbPath)
-	}
+	ethDBConfig := db.CreateDatabaseConfig(db.Level, levelDbPath)
 	ethDB, err := db.CreateDatabase(ethDBConfig)
 	if err != nil {
 		log.Fatal("Error connecting to ethereum db: ", err)
@@ -66,12 +55,12 @@ func createIpldForBlock() {
 	if err != nil {
 		log.Fatal("Error connecting to IPFS: ", err)
 	}
-	decoder := ipfs.RlpDecoder{}
-	dagPutter := eth_block_header.NewBlockHeaderDagPutter(*ipfsNode, decoder)
+	decoder := db.RlpDecoder{}
+	dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(*ipfsNode, decoder)
 	publisher := ipfs.NewIpfsPublisher(dagPutter)
 
 	// execute transformer
-	transformer := pkg.NewTransformer(ethDB, publisher)
+	transformer := transformers.NewEthBlockTransactionsTransformer(ethDB, publisher)
 	err = transformer.Execute(blockNumber, blockNumber)
 	if err != nil {
 		log.Fatal("Error executing transformer: ", err.Error())

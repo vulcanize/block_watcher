@@ -21,8 +21,5 @@ func (md *MockDecompressor) SetError(err error) {
 func (md *MockDecompressor) Decompress(raw []byte) ([]byte, error) {
 	md.Called = true
 	md.PassedBytes = raw
-	if md.Err != nil {
-		return nil, md.Err
-	}
-	return nil, nil
+	return nil, md.Err
 }

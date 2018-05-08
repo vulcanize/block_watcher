@@ -18,11 +18,8 @@ func (mdp *MockDagPutter) SetError(err error) {
 	mdp.Err = err
 }
 
-func (mdp *MockDagPutter) DagPut(raw []byte) (string, error) {
+func (mdp *MockDagPutter) DagPut(raw []byte) ([]string, error) {
 	mdp.Called = true
 	mdp.PassedBytes = raw
-	if mdp.Err != nil {
-		return "", mdp.Err
-	}
-	return "", nil
+	return nil, mdp.Err
 }

@@ -17,7 +17,7 @@ var _ = Describe("Rocks database", func() {
 		reader.SetReturnHeaderBytes([]byte{8, 8, 8, 8, 8})
 		rocksDB := rocks.NewRocksDatabase(test_helpers.NewMockDecompressor(), reader)
 
-		_, err := rocksDB.Get(0)
+		_, err := rocksDB.GetBlockHeaderByBlockNumber(0)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(reader.GetBlockHashCalled).To(BeTrue())
@@ -28,11 +28,11 @@ var _ = Describe("Rocks database", func() {
 
 	It("returns error if fetching block hash returns error", func() {
 		reader := test_helpers.NewMockRocksDatabaseReader()
-		fakeErr := errors.New("Failed")
+		fakeErr := errors.New("failed")
 		reader.SetGetHashError(fakeErr)
 		rocksDB := rocks.NewRocksDatabase(test_helpers.NewMockDecompressor(), reader)
 
-		_, err := rocksDB.Get(1234)
+		_, err := rocksDB.GetBlockHeaderByBlockNumber(1234)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError(fakeErr))
@@ -43,7 +43,7 @@ var _ = Describe("Rocks database", func() {
 		reader.SetReturnHashBytes([]byte{})
 		rocksDB := rocks.NewRocksDatabase(test_helpers.NewMockDecompressor(), reader)
 
-		_, err := rocksDB.Get(0)
+		_, err := rocksDB.GetBlockHeaderByBlockNumber(0)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError(rocks.ErrBlockHashNotFound))
@@ -56,7 +56,7 @@ var _ = Describe("Rocks database", func() {
 		reader.SetReturnHeaderBytes([]byte{8, 8, 8, 8, 8})
 		rocksDB := rocks.NewRocksDatabase(test_helpers.NewMockDecompressor(), reader)
 
-		_, err := rocksDB.Get(1234)
+		_, err := rocksDB.GetBlockHeaderByBlockNumber(1234)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(reader.GetBlockHeaderCalled).To(BeTrue())
@@ -66,11 +66,11 @@ var _ = Describe("Rocks database", func() {
 	It("returns error if fetching block header returns error", func() {
 		reader := test_helpers.NewMockRocksDatabaseReader()
 		reader.SetReturnHashBytes([]byte{9, 9, 9, 9, 9})
-		fakeErr := errors.New("Failed")
+		fakeErr := errors.New("failed")
 		reader.SetGetHeaderError(fakeErr)
 		rocksDB := rocks.NewRocksDatabase(test_helpers.NewMockDecompressor(), reader)
 
-		_, err := rocksDB.Get(1234)
+		_, err := rocksDB.GetBlockHeaderByBlockNumber(1234)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError(fakeErr))
@@ -82,7 +82,7 @@ var _ = Describe("Rocks database", func() {
 		reader.SetReturnHeaderBytes([]byte{})
 		rocksDB := rocks.NewRocksDatabase(test_helpers.NewMockDecompressor(), reader)
 
-		_, err := rocksDB.Get(0)
+		_, err := rocksDB.GetBlockHeaderByBlockNumber(0)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError(rocks.ErrBlockHeaderNotFound))
@@ -96,7 +96,7 @@ var _ = Describe("Rocks database", func() {
 		reader.SetReturnHeaderBytes(bytesToDecode)
 		rocksDB := rocks.NewRocksDatabase(decompressor, reader)
 
-		_, err := rocksDB.Get(1234)
+		_, err := rocksDB.GetBlockHeaderByBlockNumber(1234)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(decompressor.Called).To(BeTrue())
@@ -105,14 +105,14 @@ var _ = Describe("Rocks database", func() {
 
 	It("returns error if decompression returns error", func() {
 		decompressor := test_helpers.NewMockDecompressor()
-		fakeError := errors.New("Failed")
+		fakeError := errors.New("failed")
 		decompressor.SetError(fakeError)
 		reader := test_helpers.NewMockRocksDatabaseReader()
 		reader.SetReturnHashBytes([]byte{9, 9, 9, 9, 9})
 		reader.SetReturnHeaderBytes([]byte{8, 8, 8, 8, 8})
 		rocksDB := rocks.NewRocksDatabase(decompressor, reader)
 
-		_, err := rocksDB.Get(1234)
+		_, err := rocksDB.GetBlockHeaderByBlockNumber(1234)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError(fakeError))

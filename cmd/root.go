@@ -25,20 +25,22 @@ import (
 )
 
 var (
-	cfgFile        string
-	databaseConfig config.Database
-	ipc            string
-	ipfsPath       string
-	levelDbPath    string
-	rocksDbPath    string
+	blockNumber         int64
+	cfgFile             string
+	databaseConfig      config.Database
+	endingBlockNumber   int64
+	ipc                 string
+	ipfsPath            string
+	levelDbPath         string
+	rocksDbPath         string
+	startingBlockNumber int64
+	useParity           bool
 )
 
 var rootCmd = &cobra.Command{
 	Use:              "blockWatcher",
 	PersistentPreRun: database,
 }
-
-var useParity bool
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {

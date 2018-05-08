@@ -17,7 +17,7 @@ type Decompressor interface {
 	Decompress(raw []byte) ([]byte, error)
 }
 
-type EthBlockHeaderDecompressor struct {
+type EthBlockDecompressor struct {
 }
 
 type decompressError struct {
@@ -40,7 +40,7 @@ func NewDecompressError(msg string, err error) *decompressError {
 	}
 }
 
-func (d EthBlockHeaderDecompressor) Decompress(raw []byte) ([]byte, error) {
+func (d EthBlockDecompressor) Decompress(raw []byte) ([]byte, error) {
 	if len(raw) == 0 {
 		return nil, NewDecompressError("No input to decode", nil)
 	}
@@ -49,16 +49,16 @@ func (d EthBlockHeaderDecompressor) Decompress(raw []byte) ([]byte, error) {
 	}
 	_, content, _, err := rlp.Split(raw)
 	if err != nil {
-		return nil, NewDecompressError("Error decoding header:", err)
+		return nil, NewDecompressError("Error decoding block data:", err)
 	}
-	result := []byte{}
+	var result []byte
 	keepIterating := true
 	for keepIterating {
 		if len(content) == 0 {
 			keepIterating = false
 			break
 		}
-		isCompressed, idx := isInvalidRLP(content[:2])
+		isCompressed, idx := leadsWithInvalidRLP(content[:2])
 		if isCompressed {
 			decompressed := getMatchingCommonRLP(idx)
 			result = append(result, decompressed...)
@@ -82,9 +82,20 @@ func (d EthBlockHeaderDecompressor) Decompress(raw []byte) ([]byte, error) {
 func getChunkHeaderData(original []byte, separator []byte) []byte {
 	split := bytes.Split(original, separator)
 	chunkHeader := split[0]
-	// maybe worth checking for more than one leading zero
-	if len(split[1]) > 0 && split[1][0] == 0 {
-		chunkHeader = append(chunkHeader, 0)
+	if len(split[1]) > 0 {
+		keepChecking := true
+		remaining := split[1]
+		for keepChecking {
+			if remaining[0] == 0 {
+				chunkHeader = append(chunkHeader, 0)
+				if len(remaining) == 1 {
+					keepChecking = false
+				}
+				remaining = remaining[1:]
+			} else {
+				keepChecking = false
+			}
+		}
 	}
 	return chunkHeader
 }
@@ -99,7 +110,7 @@ func getRLPHeaderData(result []byte) []byte {
 	return bs
 }
 
-func isInvalidRLP(data []byte) (bool, int) {
+func leadsWithInvalidRLP(data []byte) (bool, int) {
 	for i := 0; i < len(InvalidRLPs); i++ {
 		if bytes.Equal(data, InvalidRLPs[i]) {
 			return true, i

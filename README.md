@@ -36,23 +36,31 @@ A [VulcanizeDB](https://github.com/vulcanize/VulcanizeDB) transformer for creati
     - The RocksDB file is called `db`.
     - The default location on Mac is: `/Users/$USER/Library/Application Support/io.parity.ethereum/chains/ethereum/db/906a34e69aec8c0d/overlayrecent/db`
 
-## Running the createIpldForBlock command
-- This command creates an IPLD object for a single Ethereum block.
-- `./block_watcher createIpldForBlock --config <config.toml> --block-number <block-number>`
-- Optionally, point at Parity's RocksDB instead of Geth's LevelDB with flag `-p`
-- Note: block number argument is required
+## Running the createIpldForBlockHeader command
+- This command creates an IPLD for the header of a single Ethereum block.
+- `./block_watcher createIpldForBlockHeader --config <config.toml> --block-number <block-number>`
+- Optionally, point at Parity's RocksDB instead of Geth's LevelDB with flag `-p`.
+- Note: block number argument is required.
 
-## Running the createIpldForBlocks command
-- This command creates IPLDs objects for every block in a range of Ethereum blocks.
-- `./block_watcher createIpldForBlocks --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
-- Optionally, point at Parity's RocksDB instead of Geth's LevelDB with flag `-p`
-- Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number
+## Running the createIpldForBlockHeaders command
+- This command creates IPLDs for headers in a range of Ethereum blocks.
+- `./block_watcher createIpldForBlockHeaders --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
+- Optionally, point at Parity's RocksDB instead of Geth's LevelDB with flag `-p`.
+- Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number.
+
+## Running the createIpldsForBlockTransactions command
+- This command creates IPLDs for transactions on an Ethereum block.
+- `./block_watcher createIpldsForBlockTransactions --config <config.toml> --block-number <block-number>`
+- No Parity support at this time.
+- Note: block number argument is required.
+
+## Running the createIpldsForBlocksTransactions command
+- This command creates IPLDs for transactions on a range of Ethereum blocks.
+- `./block_watcher createIpldsForBlocksTransactions --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
+- No Parity support at this time.
+- Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number.
 
 ## Running the tests
 ```
 ginkgo -r
 ```
-
-## Errors
-- If you see the error, `Error executing transformer: Error writing to IPFS: Error persisting block data: exit status 1`, you probably still need to setup go-ipld-eth (see above).
-

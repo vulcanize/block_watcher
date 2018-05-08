@@ -1,36 +1,39 @@
 package test_helpers
 
-type MockPublisher struct {
-	CalledCount      int
-	PassedBlockDatas [][]byte
-	ReturnBytes      [][]byte
-	Err              error
-}
+import . "github.com/onsi/gomega"
 
-func (mp *MockPublisher) Write(blockData []byte) (string, error) {
-	mp.CalledCount++
-	mp.PassedBlockDatas = append(mp.PassedBlockDatas, blockData)
-	if mp.Err != nil {
-		return "", mp.Err
-	}
-	bytesToReturn := mp.ReturnBytes[0]
-	mp.ReturnBytes = mp.ReturnBytes[1:]
-	return string(bytesToReturn), nil
+type MockPublisher struct {
+	err              error
+	passedBlockDatas [][]byte
+	returnStrings    [][]string
 }
 
 func NewMockPublisher() *MockPublisher {
 	return &MockPublisher{
-		CalledCount:      0,
-		PassedBlockDatas: [][]byte{},
-		ReturnBytes:      nil,
-		Err:              nil,
+		err:              nil,
+		passedBlockDatas: [][]byte{},
+		returnStrings:    nil,
 	}
 }
 
-func (mp *MockPublisher) SetReturnBytes(returnBytes [][]byte) {
-	mp.ReturnBytes = returnBytes
+func (mp *MockPublisher) SetReturnStrings(returnBytes [][]string) {
+	mp.returnStrings = returnBytes
 }
 
 func (mp *MockPublisher) SetError(err error) {
-	mp.Err = err
+	mp.err = err
+}
+
+func (mp *MockPublisher) Write(blockData []byte) ([]string, error) {
+	mp.passedBlockDatas = append(mp.passedBlockDatas, blockData)
+	if mp.err != nil {
+		return nil, mp.err
+	}
+	bytesToReturn := mp.returnStrings[0]
+	mp.returnStrings = mp.returnStrings[1:]
+	return bytesToReturn, nil
+}
+
+func (mp *MockPublisher) AssertWriteCalledWith(blockDatas [][]byte) {
+	Expect(mp.passedBlockDatas).To(Equal(blockDatas))
 }

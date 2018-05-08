@@ -19,38 +19,34 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/8thlight/block_watcher/pkg"
 	"github.com/8thlight/block_watcher/pkg/db"
 	"github.com/8thlight/block_watcher/pkg/ipfs"
 	"github.com/8thlight/block_watcher/pkg/ipfs/eth_block_header"
+	"github.com/8thlight/block_watcher/pkg/transformers"
 )
 
-// createIpldForBlocksCmd represents the createIpldForBlocks command
-var createIpldForBlocksCmd = &cobra.Command{
-	Use:   "createIpldForBlocks",
-	Short: "Create IPLD objects for multiple blocks.",
-	Long: `Create IPLD objects for multiple blocks.
+// createIpldForBlockHeaderCmd represents the createIpldForBlockHeader command
+var createIpldForBlockHeaderCmd = &cobra.Command{
+	Use:   "createIpldForBlockHeader",
+	Short: "Create an IPLD object for a block.",
+	Long: `Create an IPLD object for a block.
 
-e.g. ./block_watcher createIpldForBlocks -s 1234567 -e 4567890
+e.g. ./block_watcher createIpldForBlockHeader -b 1234567
 
 Under the hood, the command fetches the block header RLP data from LevelDB and
-puts it in IPFS, converting the data as an 'eth-block'.`,
+puts it in IPFS, converting the data as an 'eth-block'`,
 	Run: func(cmd *cobra.Command, args []string) {
-		createIpldForBlocks()
+		createIpldForBlockHeader()
 	},
 }
 
-var startingBlockNumber int64
-var endingBlockNumber int64
-
 func init() {
-	rootCmd.AddCommand(createIpldForBlocksCmd)
-	createIpldForBlocksCmd.Flags().Int64VarP(&startingBlockNumber, "starting-block-number", "s", 0, "First block number to create IPLD for")
-	createIpldForBlocksCmd.Flags().Int64VarP(&endingBlockNumber, "ending-block-number", "e", 5430000, "Last block number to create IPLD for")
-	createIpldForBlocksCmd.Flags().BoolVarP(&useParity, "parity", "p", false, "Use Parity's Rocks DB instead of Geth's Level DB")
+	rootCmd.AddCommand(createIpldForBlockHeaderCmd)
+	createIpldForBlockHeaderCmd.Flags().Int64VarP(&blockNumber, "block-number", "b", 0, "Create IPLD for this block header.")
+	createIpldForBlockHeaderCmd.Flags().BoolVarP(&useParity, "parity", "p", false, "Use Parity's RocksDB instead of Geth's LevelDB.")
 }
 
-func createIpldForBlocks() {
+func createIpldForBlockHeader() {
 	// init eth db
 	var ethDBConfig db.DatabaseConfig
 	if useParity {
@@ -68,13 +64,13 @@ func createIpldForBlocks() {
 	if err != nil {
 		log.Fatal("Error connecting to IPFS: ", err)
 	}
-	decoder := ipfs.RlpDecoder{}
+	decoder := db.RlpDecoder{}
 	dagPutter := eth_block_header.NewBlockHeaderDagPutter(*ipfsNode, decoder)
 	publisher := ipfs.NewIpfsPublisher(dagPutter)
 
 	// execute transformer
-	transformer := pkg.NewTransformer(ethDB, publisher)
-	err = transformer.Execute(startingBlockNumber, endingBlockNumber)
+	transformer := transformers.NewEthBlockHeaderTransformer(ethDB, publisher)
+	err = transformer.Execute(blockNumber, blockNumber)
 	if err != nil {
 		log.Fatal("Error executing transformer: ", err.Error())
 	}
