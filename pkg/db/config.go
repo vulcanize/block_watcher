@@ -4,7 +4,6 @@ type DatabaseType int
 
 const (
 	Level DatabaseType = iota
-	Rocks
 )
 
 type DatabaseConfig struct {

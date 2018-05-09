@@ -5,9 +5,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	"errors"
-	"github.com/8thlight/block_watcher/pkg/ipfs/eth_block_header"
-	"github.com/8thlight/block_watcher/test_helpers"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_block_header"
+	"github.com/vulcanize/block_watcher/test_helpers"
 )
 
 var _ = Describe("Creating an IPLD for a block header", func() {

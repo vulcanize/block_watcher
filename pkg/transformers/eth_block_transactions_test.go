@@ -2,12 +2,14 @@ package transformers_test
 
 import (
 	"errors"
-	"github.com/8thlight/block_watcher/pkg/transformers"
-	"github.com/8thlight/block_watcher/test_helpers"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"log"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
+	"github.com/vulcanize/block_watcher/pkg/transformers"
+	"github.com/vulcanize/block_watcher/test_helpers"
 )
 
 var _ = Describe("Eth block transactions transformer", func() {

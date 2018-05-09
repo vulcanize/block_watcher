@@ -1,8 +1,8 @@
 package transformers
 
 import (
-	"github.com/8thlight/block_watcher/pkg/db"
-	"github.com/8thlight/block_watcher/pkg/ipfs"
+	"github.com/vulcanize/block_watcher/pkg/db"
+	"github.com/vulcanize/block_watcher/pkg/ipfs"
 	"log"
 )
 

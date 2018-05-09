@@ -1,12 +1,12 @@
 package eth_block_header
 
 import (
-	"github.com/8thlight/block_watcher/pkg/ipfs"
 	"github.com/ethereum/go-ethereum/core/types"
-
-	"github.com/8thlight/block_watcher/pkg/db"
-	"github.com/8thlight/block_watcher/pkg/ipfs/util"
 	ipld "gx/ipfs/Qme5bWv7wtjUNGsK2BNGVUFPKiuxWrsqrtvYwCLRw8YFES/go-ipld-format"
+
+	"github.com/vulcanize/block_watcher/pkg/db"
+	"github.com/vulcanize/block_watcher/pkg/ipfs"
+	"github.com/vulcanize/block_watcher/pkg/ipfs/util"
 )
 
 const (

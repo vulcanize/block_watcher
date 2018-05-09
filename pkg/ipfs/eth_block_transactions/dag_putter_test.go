@@ -2,11 +2,13 @@ package eth_block_transactions_test
 
 import (
 	"errors"
-	"github.com/8thlight/block_watcher/pkg/ipfs/eth_block_transactions"
-	"github.com/8thlight/block_watcher/test_helpers"
+
 	"github.com/ethereum/go-ethereum/core/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_block_transactions"
+	"github.com/vulcanize/block_watcher/test_helpers"
 )
 
 var _ = Describe("Eth block transactions dag putter", func() {

@@ -15,12 +15,14 @@
 package cmd
 
 import (
-	"github.com/8thlight/block_watcher/pkg/db"
-	"github.com/8thlight/block_watcher/pkg/ipfs"
-	"github.com/8thlight/block_watcher/pkg/ipfs/eth_block_transactions"
-	"github.com/8thlight/block_watcher/pkg/transformers"
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
+
+	"github.com/vulcanize/block_watcher/pkg/db"
+	"github.com/vulcanize/block_watcher/pkg/ipfs"
+	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_block_transactions"
+	"github.com/vulcanize/block_watcher/pkg/transformers"
 )
 
 // createIpldsForBlocksTransactionsCmd represents the createIpldsForBlocksTransactions command

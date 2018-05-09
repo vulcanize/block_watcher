@@ -2,10 +2,12 @@ package eth_block_transactions
 
 import (
 	"bytes"
-	"github.com/8thlight/block_watcher/pkg/db"
-	"github.com/8thlight/block_watcher/pkg/ipfs"
-	"github.com/8thlight/block_watcher/pkg/ipfs/util"
+
 	"github.com/ethereum/go-ethereum/core/types"
+
+	"github.com/vulcanize/block_watcher/pkg/db"
+	"github.com/vulcanize/block_watcher/pkg/ipfs"
+	"github.com/vulcanize/block_watcher/pkg/ipfs/util"
 )
 
 const (

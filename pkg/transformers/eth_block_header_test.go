@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/8thlight/block_watcher/pkg/transformers"
-	"github.com/8thlight/block_watcher/test_helpers"
+	"github.com/vulcanize/block_watcher/pkg/transformers"
+	"github.com/vulcanize/block_watcher/test_helpers"
 )
 
 var _ = Describe("EthBlockHeaderTransformer", func() {

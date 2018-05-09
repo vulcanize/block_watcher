@@ -2,10 +2,10 @@ package ipfs_test
 
 import (
 	"errors"
-	"github.com/8thlight/block_watcher/pkg/ipfs"
-	"github.com/8thlight/block_watcher/test_helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/vulcanize/block_watcher/pkg/ipfs"
+	"github.com/vulcanize/block_watcher/test_helpers"
 )
 
 var _ = Describe("IPFS publisher", func() {

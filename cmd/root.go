@@ -32,9 +32,7 @@ var (
 	ipc                 string
 	ipfsPath            string
 	levelDbPath         string
-	rocksDbPath         string
 	startingBlockNumber int64
-	useParity           bool
 )
 
 var rootCmd = &cobra.Command{
@@ -52,7 +50,6 @@ func Execute() {
 func database(cmd *cobra.Command, args []string) {
 	ipc = viper.GetString("client.ipcpath")
 	levelDbPath = viper.GetString("client.leveldbpath")
-	rocksDbPath = viper.GetString("client.rocksdbpath")
 	ipfsPath = viper.GetString("client.ipfspath")
 	databaseConfig = config.Database{
 		Name:     viper.GetString("database.name"),
@@ -72,7 +69,6 @@ func init() {
 	rootCmd.PersistentFlags().String("client-ipcPath", "", "location of geth.ipc file")
 	rootCmd.PersistentFlags().String("client-ipfsPath", "", "location of ipfs directory")
 	rootCmd.PersistentFlags().String("client-levelDbPath", "", "location of levelDb chaindata")
-	rootCmd.PersistentFlags().String("client-rocksDbPath", "", "location of rocksDb chaindata")
 
 	viper.BindPFlag("database.name", rootCmd.PersistentFlags().Lookup("database-name"))
 	viper.BindPFlag("database.port", rootCmd.PersistentFlags().Lookup("database-port"))
@@ -80,7 +76,6 @@ func init() {
 	viper.BindPFlag("client.ipcPath", rootCmd.PersistentFlags().Lookup("client-ipcPath"))
 	viper.BindPFlag("client.ipfsPath", rootCmd.PersistentFlags().Lookup("client-ipfsPath"))
 	viper.BindPFlag("client.levelDbPath", rootCmd.PersistentFlags().Lookup("client-levelDbPath"))
-	viper.BindPFlag("client.rocksDbPath", rootCmd.PersistentFlags().Lookup("client-rocksDbPath"))
 
 }
 

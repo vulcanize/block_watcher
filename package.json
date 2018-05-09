@@ -1,10 +1,10 @@
 {
   "author": "robertmulholand",
   "bugs": {
-    "url": "github.com/8thlight/block_watcher"
+    "url": "github.com/vulcanize/block_watcher"
   },
   "gx": {
-    "dvcsimport": "github.com/8thlight/block_watcher"
+    "dvcsimport": "github.com/vulcanize/block_watcher"
   },
   "gxDependencies": [
     {

@@ -19,10 +19,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/8thlight/block_watcher/pkg/db"
-	"github.com/8thlight/block_watcher/pkg/ipfs"
-	"github.com/8thlight/block_watcher/pkg/ipfs/eth_block_header"
-	"github.com/8thlight/block_watcher/pkg/transformers"
+	"github.com/vulcanize/block_watcher/pkg/db"
+	"github.com/vulcanize/block_watcher/pkg/ipfs"
+	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_block_header"
+	"github.com/vulcanize/block_watcher/pkg/transformers"
 )
 
 // createIpldForBlockHeaderCmd represents the createIpldForBlockHeader command
@@ -43,17 +43,11 @@ puts it in IPFS, converting the data as an 'eth-block'`,
 func init() {
 	rootCmd.AddCommand(createIpldForBlockHeaderCmd)
 	createIpldForBlockHeaderCmd.Flags().Int64VarP(&blockNumber, "block-number", "b", 0, "Create IPLD for this block header.")
-	createIpldForBlockHeaderCmd.Flags().BoolVarP(&useParity, "parity", "p", false, "Use Parity's RocksDB instead of Geth's LevelDB.")
 }
 
 func createIpldForBlockHeader() {
 	// init eth db
-	var ethDBConfig db.DatabaseConfig
-	if useParity {
-		ethDBConfig = db.CreateDatabaseConfig(db.Rocks, rocksDbPath)
-	} else {
-		ethDBConfig = db.CreateDatabaseConfig(db.Level, levelDbPath)
-	}
+	ethDBConfig := db.CreateDatabaseConfig(db.Level, levelDbPath)
 	ethDB, err := db.CreateDatabase(ethDBConfig)
 	if err != nil {
 		log.Fatal("Error connecting to ethereum db: ", err)

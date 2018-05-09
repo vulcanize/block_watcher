@@ -2,7 +2,7 @@ package level
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -14,21 +14,21 @@ type reader interface {
 }
 
 type LDBReader struct {
-	core.DatabaseReader
+	rawdb.DatabaseReader
 }
 
-func NewLevelDatabaseReader(reader core.DatabaseReader) *LDBReader {
+func NewLevelDatabaseReader(reader rawdb.DatabaseReader) *LDBReader {
 	return &LDBReader{DatabaseReader: reader}
 }
 
 func (ldbr *LDBReader) GetCanonicalHash(number uint64) common.Hash {
-	return core.GetCanonicalHash(ldbr.DatabaseReader, number)
+	return rawdb.ReadCanonicalHash(ldbr.DatabaseReader, number)
 }
 
 func (ldbr *LDBReader) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
-	return core.GetHeaderRLP(ldbr.DatabaseReader, hash, number)
+	return rawdb.ReadHeaderRLP(ldbr.DatabaseReader, hash, number)
 }
 
 func (ldbr *LDBReader) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
-	return core.GetBodyRLP(ldbr.DatabaseReader, hash, number)
+	return rawdb.ReadBodyRLP(ldbr.DatabaseReader, hash, number)
 }
