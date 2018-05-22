@@ -22,6 +22,7 @@ func (re ReadError) Error() string {
 type Database interface {
 	GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error)
 	GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
+	GetStateTrieNodes(root []byte) ([][]byte, error)
 }
 
 func CreateDatabase(config DatabaseConfig) (Database, error) {

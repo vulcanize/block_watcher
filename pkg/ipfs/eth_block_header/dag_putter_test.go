@@ -1,11 +1,12 @@
 package eth_block_header_test
 
 import (
+	"errors"
+
+	"github.com/ethereum/go-ethereum/core/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"errors"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_block_header"
 	"github.com/vulcanize/block_watcher/test_helpers"
 )

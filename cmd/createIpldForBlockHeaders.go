@@ -47,6 +47,10 @@ func init() {
 }
 
 func createIpldForBlockHeaders() {
+	if endingBlockNumber < startingBlockNumber {
+		log.Fatal("Ending block number must be greater than or equal to starting block number.")
+	}
+
 	// init eth db
 	ethDBConfig := db.CreateDatabaseConfig(db.Level, levelDbPath)
 	ethDB, err := db.CreateDatabase(ethDBConfig)

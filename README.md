@@ -54,6 +54,11 @@ A [VulcanizeDB](https://github.com/vulcanize/VulcanizeDB) transformer for creati
 - `./block_watcher createIpldsForBlocksTransactions --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
 - Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number.
 
+## Running the createIpldsForStateTrie command
+- This command creates IPLDs for state trie nodes in a range of Ethereum blocks.
+- `./block_watcher createIpldsForStateTrie --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
+- Note: requires running an archive node. LevelDB lookup for state trie will fail otherwise due to state pruning.
+
 ## Running the tests
 ```
 ginkgo -r

@@ -3,32 +3,60 @@ package level
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 // Wraps go-ethereum db operations
-type reader interface {
+type Reader interface {
 	GetCanonicalHash(number uint64) common.Hash
 	GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue
 	GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue
+	GetStateTrieNodes(root common.Hash) ([][]byte, error)
 }
 
 type LDBReader struct {
-	rawdb.DatabaseReader
+	EthDbConnection ethdb.Database
+	trieDb          *trie.Database
 }
 
-func NewLevelDatabaseReader(reader rawdb.DatabaseReader) *LDBReader {
-	return &LDBReader{DatabaseReader: reader}
+func NewLevelDatabaseReader(reader ethdb.Database) *LDBReader {
+	trieDb := trie.NewDatabase(reader)
+	return &LDBReader{EthDbConnection: reader, trieDb: trieDb}
 }
 
 func (ldbr *LDBReader) GetCanonicalHash(number uint64) common.Hash {
-	return rawdb.ReadCanonicalHash(ldbr.DatabaseReader, number)
+	return rawdb.ReadCanonicalHash(ldbr.EthDbConnection, number)
 }
 
 func (ldbr *LDBReader) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
-	return rawdb.ReadHeaderRLP(ldbr.DatabaseReader, hash, number)
+	return rawdb.ReadHeaderRLP(ldbr.EthDbConnection, hash, number)
 }
 
 func (ldbr *LDBReader) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
-	return rawdb.ReadBodyRLP(ldbr.DatabaseReader, hash, number)
+	return rawdb.ReadBodyRLP(ldbr.EthDbConnection, hash, number)
+}
+
+func (ldbr *LDBReader) GetStateTrieNodes(root common.Hash) ([][]byte, error) {
+	var results [][]byte
+	stateTrie, err := trie.New(root, ldbr.trieDb)
+	if err != nil {
+		return nil, err
+	}
+	stateTrieIterator := stateTrie.NodeIterator(root.Bytes())
+	rootNode, err := ldbr.trieDb.Node(root)
+	if err != nil {
+		return nil, err
+	}
+	results = append(results, rootNode)
+	for stateTrieIterator.Next(true) {
+		nextNodeHash := stateTrieIterator.Hash()
+		nextNode, err := ldbr.trieDb.Node(nextNodeHash)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, nextNode)
+	}
+	return results, nil
 }
