@@ -43,6 +43,7 @@ as an archive node.`,
 
 func init() {
 	rootCmd.AddCommand(createIpldsForStateTrieCmd)
+	createIpldsForStateTrieCmd.Flags().BoolVarP(&computeState, "compute-state", "c", false, "Flag indicating state must be computed (non-archive node).")
 	createIpldsForStateTrieCmd.Flags().Int64VarP(&startingBlockNumber, "starting-block-number", "s", 0, "First block number to create IPLD for.")
 	createIpldsForStateTrieCmd.Flags().Int64VarP(&endingBlockNumber, "ending-block-number", "e", 5430000, "Last block number to create IPLD for.")
 }
@@ -50,6 +51,9 @@ func init() {
 func createIpldsForStateTrie() {
 	if endingBlockNumber < startingBlockNumber {
 		log.Fatal("Ending block number must be greater than or equal to starting block number.")
+	}
+	if computeState && startingBlockNumber != 0 {
+		log.Println("Computing state trie must begin at genesis block. Ignoring passed starting block number.")
 	}
 
 	// init eth db
@@ -71,8 +75,13 @@ func createIpldsForStateTrie() {
 	publisher := ipfs.NewIpfsPublisher(dagPutter)
 
 	// init and execute transformer
-	transformer := transformers.NewEthStateTrieTransformer(database, decoder, publisher)
-	err = transformer.Execute(startingBlockNumber, endingBlockNumber)
+	if computeState {
+		transformer := transformers.NewComputeEthStateTrieTransformer(database, decoder, publisher)
+		err = transformer.Execute(endingBlockNumber)
+	} else {
+		transformer := transformers.NewEthStateTrieTransformer(database, decoder, publisher)
+		err = transformer.Execute(startingBlockNumber, endingBlockNumber)
+	}
 	if err != nil {
 		log.Fatal("Error executing transformer: ", err)
 	}

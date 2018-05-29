@@ -21,7 +21,7 @@ var _ = Describe("Ethereum state trie transformer", func() {
 
 	It("fetches block header for block", func() {
 		mockDatabase := test_helpers.NewMockDatabase()
-		mockDatabase.SetHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+		mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 		mockDecoder := test_helpers.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
 		transformer := transformers.NewEthStateTrieTransformer(mockDatabase, mockDecoder, test_helpers.NewMockPublisher())
@@ -35,7 +35,7 @@ var _ = Describe("Ethereum state trie transformer", func() {
 	It("returns err if fetching block header returns err", func() {
 		mockDatabase := test_helpers.NewMockDatabase()
 		fakeError := errors.New("header fetching failed")
-		mockDatabase.SetHeaderByBlockNumberError(fakeError)
+		mockDatabase.SetGetBlockHeaderByBlockNumberError(fakeError)
 		transformer := transformers.NewEthStateTrieTransformer(mockDatabase, test_helpers.NewMockDecoder(), test_helpers.NewMockPublisher())
 
 		err := transformer.Execute(0, 0)
@@ -47,7 +47,7 @@ var _ = Describe("Ethereum state trie transformer", func() {
 	It("fetches state trie nodes with state root from decoded block header", func() {
 		mockDatabase := test_helpers.NewMockDatabase()
 		fakeHeader := []byte{6, 7, 8, 9, 0}
-		mockDatabase.SetHeaderByBlockNumberReturnBytes([][]byte{fakeHeader})
+		mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeHeader})
 		mockDecoder := test_helpers.NewMockDecoder()
 		rootHash := common.HexToHash("0x12345")
 		mockDecoder.SetReturnOut(&types.Header{Root: rootHash})
@@ -62,9 +62,9 @@ var _ = Describe("Ethereum state trie transformer", func() {
 
 	It("returns err if fetching state trie returns err", func() {
 		mockDatabase := test_helpers.NewMockDatabase()
-		mockDatabase.SetHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+		mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 		fakeError := errors.New("state trie fetching failed")
-		mockDatabase.SetStateTrieNodesError(fakeError)
+		mockDatabase.SetGetStateTrieNodesError(fakeError)
 		mockDecoder := test_helpers.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{Root: common.Hash{}})
 		transformer := transformers.NewEthStateTrieTransformer(mockDatabase, mockDecoder, test_helpers.NewMockPublisher())
@@ -77,9 +77,9 @@ var _ = Describe("Ethereum state trie transformer", func() {
 
 	It("writes state trie nodes to ipfs", func() {
 		mockDatabase := test_helpers.NewMockDatabase()
-		mockDatabase.SetHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+		mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 		fakeStateTrieNodes := [][]byte{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 0}}
-		mockDatabase.SetStateTrieNodesReturnBytes(fakeStateTrieNodes)
+		mockDatabase.SetGetStateTrieNodesReturnBytes(fakeStateTrieNodes)
 		mockDecoder := test_helpers.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
 		mockPublisher := test_helpers.NewMockPublisher()

@@ -2,11 +2,15 @@ package test_helpers
 
 import (
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rlp"
 	. "github.com/onsi/gomega"
 )
 
 type MockLevelDatabaseReader struct {
+	getBlockPassedHash           common.Hash
+	getBlockPassedNumber         uint64
+	getBlockReturnBlock          *types.Block
 	getBodyRLPPassedHash         common.Hash
 	getBodyRLPPassedNumber       uint64
 	getCanonicalHashPassedNumber uint64
@@ -32,6 +36,10 @@ func NewMockLevelDatabaseReader() *MockLevelDatabaseReader {
 	}
 }
 
+func (mldr *MockLevelDatabaseReader) SetGetBlockReturnBlock(returnBlock *types.Block) {
+	mldr.getBlockReturnBlock = returnBlock
+}
+
 func (mldr *MockLevelDatabaseReader) SetGetCanonicalHashReturnHash(hash common.Hash) {
 	mldr.getCanonicalHashReturnHash = hash
 }
@@ -42,6 +50,12 @@ func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnBytes(returnBytes
 
 func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnErr(err error) {
 	mldr.getStateTrieNodesReturnErr = err
+}
+
+func (mldr *MockLevelDatabaseReader) GetBlock(hash common.Hash, number uint64) *types.Block {
+	mldr.getBlockPassedHash = hash
+	mldr.getBlockPassedNumber = number
+	return mldr.getBlockReturnBlock
 }
 
 func (mldr *MockLevelDatabaseReader) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
@@ -64,6 +78,11 @@ func (mldr *MockLevelDatabaseReader) GetHeaderRLP(hash common.Hash, number uint6
 func (mldr *MockLevelDatabaseReader) GetStateTrieNodes(root common.Hash) ([][]byte, error) {
 	mldr.getStateTrieNodesPassedRoot = root
 	return mldr.getStateTrieNodesReturnBytes, mldr.getStateTrieNodesReturnErr
+}
+
+func (mldr *MockLevelDatabaseReader) AssertGetBlockCalledWith(hash common.Hash, number uint64) {
+	Expect(mldr.getBlockPassedHash).To(Equal(hash))
+	Expect(mldr.getBlockPassedNumber).To(Equal(number))
 }
 
 func (mldr *MockLevelDatabaseReader) AssertGetBodyRLPCalledWith(hash common.Hash, number uint64) {

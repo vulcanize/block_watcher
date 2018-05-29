@@ -27,6 +27,7 @@ import (
 var (
 	blockNumber         int64
 	cfgFile             string
+	computeState        bool
 	databaseConfig      config.Database
 	endingBlockNumber   int64
 	ipc                 string

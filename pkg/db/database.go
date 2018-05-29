@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/vulcanize/block_watcher/pkg/db/level"
 )
@@ -20,6 +21,8 @@ func (re ReadError) Error() string {
 }
 
 type Database interface {
+	ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) ([][]byte, error)
+	GetBlockByBlockNumber(blockNumber int64) *types.Block
 	GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error)
 	GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
 	GetStateTrieNodes(root []byte) ([][]byte, error)
@@ -33,7 +36,8 @@ func CreateDatabase(config DatabaseConfig) (Database, error) {
 			return nil, ReadError{msg: "Failed to connect to LevelDB", err: err}
 		}
 		levelDBReader := level.NewLevelDatabaseReader(levelDBConnection)
-		levelDB := level.NewLevelDatabase(levelDBReader)
+		stateComputer := level.NewLDBStateComputer(levelDBConnection)
+		levelDB := level.NewLevelDatabase(levelDBReader, stateComputer)
 		return levelDB, nil
 	default:
 		return nil, ReadError{msg: "Unknown database not implemented", err: ErrNoSuchDb}

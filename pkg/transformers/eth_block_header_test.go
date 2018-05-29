@@ -25,7 +25,7 @@ var _ = Describe("EthBlockHeaderTransformer", func() {
 			mockPublisher = test_helpers.NewMockPublisher()
 			blockNumber = 54321
 			fakeBytes = []byte{6, 7, 8, 9, 0}
-			mockDatabase.SetHeaderByBlockNumberReturnBytes([][]byte{fakeBytes})
+			mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeBytes})
 			mockPublisher.SetReturnStrings([][]string{{"cid_one", "cid_two"}})
 			log.SetOutput(ioutil.Discard)
 		})
@@ -41,7 +41,7 @@ var _ = Describe("EthBlockHeaderTransformer", func() {
 
 		It("Returns error if fetching block RLP data from ethereum DB fails", func() {
 			fakeError := errors.New("failed")
-			mockDatabase.SetHeaderByBlockNumberError(fakeError)
+			mockDatabase.SetGetBlockHeaderByBlockNumberError(fakeError)
 			transformer := transformers.NewEthBlockHeaderTransformer(mockDatabase, mockPublisher)
 
 			err := transformer.Execute(blockNumber, blockNumber)
@@ -85,7 +85,7 @@ var _ = Describe("EthBlockHeaderTransformer", func() {
 			startingBlockNumber = 54321
 			endingBlockNumber = 54322
 			fakeRlpBytes = []byte{6, 7, 8, 9, 0}
-			mockDatabase.SetHeaderByBlockNumberReturnBytes([][]byte{fakeRlpBytes, fakeRlpBytes})
+			mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeRlpBytes, fakeRlpBytes})
 			fakeOutputString := []string{"cid_one", "cid_two"}
 			mockPublisher.SetReturnStrings([][]string{fakeOutputString, fakeOutputString})
 			log.SetOutput(ioutil.Discard)

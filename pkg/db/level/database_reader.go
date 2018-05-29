@@ -3,6 +3,7 @@ package level
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
@@ -10,32 +11,37 @@ import (
 
 // Wraps go-ethereum db operations
 type Reader interface {
+	GetBlock(hash common.Hash, number uint64) *types.Block
+	GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue
 	GetCanonicalHash(number uint64) common.Hash
 	GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue
-	GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue
 	GetStateTrieNodes(root common.Hash) ([][]byte, error)
 }
 
 type LDBReader struct {
-	EthDbConnection ethdb.Database
+	ethDbConnection ethdb.Database
 	trieDb          *trie.Database
 }
 
-func NewLevelDatabaseReader(reader ethdb.Database) *LDBReader {
-	trieDb := trie.NewDatabase(reader)
-	return &LDBReader{EthDbConnection: reader, trieDb: trieDb}
+func NewLevelDatabaseReader(databaseConnection ethdb.Database) *LDBReader {
+	trieDb := trie.NewDatabase(databaseConnection)
+	return &LDBReader{ethDbConnection: databaseConnection, trieDb: trieDb}
 }
 
-func (ldbr *LDBReader) GetCanonicalHash(number uint64) common.Hash {
-	return rawdb.ReadCanonicalHash(ldbr.EthDbConnection, number)
-}
-
-func (ldbr *LDBReader) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
-	return rawdb.ReadHeaderRLP(ldbr.EthDbConnection, hash, number)
+func (ldbr *LDBReader) GetBlock(hash common.Hash, number uint64) *types.Block {
+	return rawdb.ReadBlock(ldbr.ethDbConnection, hash, number)
 }
 
 func (ldbr *LDBReader) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
-	return rawdb.ReadBodyRLP(ldbr.EthDbConnection, hash, number)
+	return rawdb.ReadBodyRLP(ldbr.ethDbConnection, hash, number)
+}
+
+func (ldbr *LDBReader) GetCanonicalHash(number uint64) common.Hash {
+	return rawdb.ReadCanonicalHash(ldbr.ethDbConnection, number)
+}
+
+func (ldbr *LDBReader) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
+	return rawdb.ReadHeaderRLP(ldbr.ethDbConnection, hash, number)
 }
 
 func (ldbr *LDBReader) GetStateTrieNodes(root common.Hash) ([][]byte, error) {
