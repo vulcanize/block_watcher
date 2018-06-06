@@ -1,7 +1,6 @@
 package ipfs_test
 
 import (
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/vulcanize/block_watcher/pkg/ipfs"
@@ -23,13 +22,12 @@ var _ = Describe("IPFS publisher", func() {
 
 	It("returns error if dag put fails", func() {
 		mockDagPutter := test_helpers.NewMockDagPutter()
-		fakeError := errors.New("failed")
-		mockDagPutter.SetError(fakeError)
+		mockDagPutter.SetError(test_helpers.FakeError)
 		publisher := ipfs.NewIpfsPublisher(mockDagPutter)
 
 		_, err := publisher.DagPut([]byte{1, 2, 3, 4, 5})
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(fakeError))
+		Expect(err).To(MatchError(test_helpers.FakeError))
 	})
 })

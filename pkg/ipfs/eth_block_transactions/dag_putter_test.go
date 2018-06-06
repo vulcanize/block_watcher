@@ -1,8 +1,6 @@
 package eth_block_transactions_test
 
 import (
-	"errors"
-
 	"github.com/ethereum/go-ethereum/core/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -28,14 +26,13 @@ var _ = Describe("Eth block transactions dag putter", func() {
 	It("returns error if decoding fails", func() {
 		mockAdder := test_helpers.NewMockAdder()
 		mockDecoder := test_helpers.NewMockDecoder()
-		fakeError := errors.New("failed")
-		mockDecoder.SetError(fakeError)
+		mockDecoder.SetError(test_helpers.FakeError)
 		dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(mockAdder, mockDecoder)
 
 		_, err := dagPutter.DagPut([]byte{1, 2, 3, 4, 5})
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(fakeError))
+		Expect(err).To(MatchError(test_helpers.FakeError))
 	})
 
 	It("adds a node for each transaction on the block", func() {
@@ -58,8 +55,7 @@ var _ = Describe("Eth block transactions dag putter", func() {
 
 	It("returns error if adding node fails", func() {
 		mockAdder := test_helpers.NewMockAdder()
-		fakeError := errors.New("failed")
-		mockAdder.SetError(fakeError)
+		mockAdder.SetError(test_helpers.FakeError)
 		mockDecoder := test_helpers.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Body{Transactions: types.Transactions{&types.Transaction{}}})
 		dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(mockAdder, mockDecoder)
@@ -67,6 +63,6 @@ var _ = Describe("Eth block transactions dag putter", func() {
 		_, err := dagPutter.DagPut([]byte{1, 2, 3, 4, 5})
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(fakeError))
+		Expect(err).To(MatchError(test_helpers.FakeError))
 	})
 })

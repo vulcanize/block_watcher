@@ -8,7 +8,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/vulcanize/block_watcher/pkg/db/level"
 	"github.com/vulcanize/block_watcher/test_helpers"
-	"gx/ipfs/QmVmDhyTTUcQXFD1rRQ64fGLMSAoaQvNH3hwuaCFAPq2hy/errors"
 )
 
 var _ = Describe("Database", func() {
@@ -27,14 +26,13 @@ var _ = Describe("Database", func() {
 
 		It("returns err if state computer returns err", func() {
 			mockStateComputer := test_helpers.NewMockStateComputer()
-			fakeError := errors.New("failed")
-			mockStateComputer.SetComputeBlockStateTrieReturnErr(fakeError)
+			mockStateComputer.SetComputeBlockStateTrieReturnErr(test_helpers.FakeError)
 			db := level.NewLevelDatabase(test_helpers.NewMockLevelDatabaseReader(), mockStateComputer)
 
 			_, err := db.ComputeBlockStateTrie(&types.Block{}, &types.Block{})
 
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(fakeError))
+			Expect(err).To(MatchError(test_helpers.FakeError))
 		})
 	})
 

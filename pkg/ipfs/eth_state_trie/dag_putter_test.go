@@ -1,8 +1,6 @@
 package eth_state_trie_test
 
 import (
-	"errors"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -23,13 +21,12 @@ var _ = Describe("Ethereum state trie node dag putter", func() {
 
 	It("returns error if adding to ipfs fails", func() {
 		mockAdder := test_helpers.NewMockAdder()
-		fakeError := errors.New("failed")
-		mockAdder.SetError(fakeError)
+		mockAdder.SetError(test_helpers.FakeError)
 		dagPutter := eth_state_trie.NewStateTrieDagPutter(mockAdder)
 
 		_, err := dagPutter.DagPut([]byte{1, 2, 3, 4, 5})
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(fakeError))
+		Expect(err).To(MatchError(test_helpers.FakeError))
 	})
 })

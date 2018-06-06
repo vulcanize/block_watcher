@@ -13,7 +13,7 @@ type MockDatabase struct {
 	getBlockBodyByBlockNumberErr                  error
 	getBlockBodyByBlockNumberPassedBlockNumbers   []int64
 	getBlockBodyByBlockNumberReturnBytes          [][]byte
-	getBlockByBlockNumberPassedNumber             int64
+	getBlockByBlockNumberPassedNumbers            []int64
 	getBlockByBlockNumberReturnBlock              *types.Block
 	getBlockHeaderByBlockNumberErr                error
 	getBlockHeaderByBlockNumberPassedBlockNumbers []int64
@@ -32,7 +32,7 @@ func NewMockDatabase() *MockDatabase {
 		getBlockBodyByBlockNumberErr:                  nil,
 		getBlockBodyByBlockNumberPassedBlockNumbers:   nil,
 		getBlockBodyByBlockNumberReturnBytes:          nil,
-		getBlockByBlockNumberPassedNumber:             0,
+		getBlockByBlockNumberPassedNumbers:            nil,
 		getBlockByBlockNumberReturnBlock:              nil,
 		getBlockHeaderByBlockNumberErr:                nil,
 		getBlockHeaderByBlockNumberPassedBlockNumbers: nil,
@@ -41,6 +41,10 @@ func NewMockDatabase() *MockDatabase {
 		getStateTrieNodesPassedRoot:                   nil,
 		getStateTrieNodesReturnBytes:                  nil,
 	}
+}
+
+func (md *MockDatabase) SetComputeBlockStateTrieReturnBytes(returnBytes [][]byte) {
+	md.computeBlockStateTrieReturnBytes = returnBytes
 }
 
 func (md *MockDatabase) SetGetBlockBodyByBlockNumberReturnBytes(returnBytes [][]byte) {
@@ -57,6 +61,10 @@ func (md *MockDatabase) SetGetBlockHeaderByBlockNumberReturnBytes(returnBytes []
 
 func (md *MockDatabase) SetGetStateTrieNodesReturnBytes(returnBytes [][]byte) {
 	md.getStateTrieNodesReturnBytes = returnBytes
+}
+
+func (md *MockDatabase) SetComputeBlockStateTrieError(err error) {
+	md.computeBlockStateTrieErr = err
 }
 
 func (md *MockDatabase) SetGetBlockBodyByBlockNumberError(err error) {
@@ -88,7 +96,7 @@ func (md *MockDatabase) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, er
 }
 
 func (md *MockDatabase) GetBlockByBlockNumber(blockNumber int64) *types.Block {
-	md.getBlockByBlockNumberPassedNumber = blockNumber
+	md.getBlockByBlockNumberPassedNumbers = append(md.getBlockByBlockNumberPassedNumbers, blockNumber)
 	return md.getBlockByBlockNumberReturnBlock
 }
 
@@ -116,8 +124,13 @@ func (md *MockDatabase) AssertGetBlockBodyByBlockNumberCalledWith(blockNumbers [
 	Expect(md.getBlockBodyByBlockNumberPassedBlockNumbers).To(Equal(blockNumbers))
 }
 
-func (md *MockDatabase) AssertGetBlockByBlockNumberCalledwith(blockNumber int64) {
-	Expect(md.getBlockByBlockNumberPassedNumber).To(Equal(blockNumber))
+func (md *MockDatabase) AssertGetBlockByBlockNumberCalledwith(blockNumbers []int64) {
+	for i := 0; i < len(blockNumbers); i++ {
+		Expect(md.getBlockByBlockNumberPassedNumbers).To(ContainElement(blockNumbers[i]))
+	}
+	for i := 0; i < len(md.getBlockByBlockNumberPassedNumbers); i++ {
+		Expect(blockNumbers).To(ContainElement(md.getBlockByBlockNumberPassedNumbers[i]))
+	}
 }
 
 func (md *MockDatabase) AssertGetBlockHeaderByBlockNumberCalledWith(blockNumbers []int64) {

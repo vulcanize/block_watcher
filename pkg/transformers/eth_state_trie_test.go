@@ -8,8 +8,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gx/ipfs/QmVmDhyTTUcQXFD1rRQ64fGLMSAoaQvNH3hwuaCFAPq2hy/errors"
-
 	"github.com/vulcanize/block_watcher/pkg/transformers"
 	"github.com/vulcanize/block_watcher/test_helpers"
 )
@@ -34,14 +32,13 @@ var _ = Describe("Ethereum state trie transformer", func() {
 
 	It("returns err if fetching block header returns err", func() {
 		mockDatabase := test_helpers.NewMockDatabase()
-		fakeError := errors.New("header fetching failed")
-		mockDatabase.SetGetBlockHeaderByBlockNumberError(fakeError)
+		mockDatabase.SetGetBlockHeaderByBlockNumberError(test_helpers.FakeError)
 		transformer := transformers.NewEthStateTrieTransformer(mockDatabase, test_helpers.NewMockDecoder(), test_helpers.NewMockPublisher())
 
 		err := transformer.Execute(0, 0)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring(fakeError.Error()))
+		Expect(err.Error()).To(ContainSubstring(test_helpers.FakeError.Error()))
 	})
 
 	It("fetches state trie nodes with state root from decoded block header", func() {
@@ -63,8 +60,7 @@ var _ = Describe("Ethereum state trie transformer", func() {
 	It("returns err if fetching state trie returns err", func() {
 		mockDatabase := test_helpers.NewMockDatabase()
 		mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-		fakeError := errors.New("state trie fetching failed")
-		mockDatabase.SetGetStateTrieNodesError(fakeError)
+		mockDatabase.SetGetStateTrieNodesError(test_helpers.FakeError)
 		mockDecoder := test_helpers.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{Root: common.Hash{}})
 		transformer := transformers.NewEthStateTrieTransformer(mockDatabase, mockDecoder, test_helpers.NewMockPublisher())
@@ -72,7 +68,7 @@ var _ = Describe("Ethereum state trie transformer", func() {
 		err := transformer.Execute(0, 0)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring(fakeError.Error()))
+		Expect(err.Error()).To(ContainSubstring(test_helpers.FakeError.Error()))
 	})
 
 	It("writes state trie nodes to ipfs", func() {

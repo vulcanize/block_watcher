@@ -1,8 +1,6 @@
 package eth_block_header_test
 
 import (
-	"errors"
-
 	"github.com/ethereum/go-ethereum/core/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,14 +24,13 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 
 	It("returns error if decoding fails", func() {
 		mockDecoder := test_helpers.NewMockDecoder()
-		fakeError := errors.New("failed")
-		mockDecoder.SetError(fakeError)
+		mockDecoder.SetError(test_helpers.FakeError)
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(test_helpers.NewMockAdder(), mockDecoder)
 
 		_, err := dagPutter.DagPut([]byte{1, 2, 3, 4, 5})
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(fakeError))
+		Expect(err).To(MatchError(test_helpers.FakeError))
 	})
 
 	It("adds ethereum block header to ipfs", func() {
@@ -51,8 +48,7 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 
 	It("returns error if adding to ipfs fails", func() {
 		mockAdder := test_helpers.NewMockAdder()
-		fakeError := errors.New("failed")
-		mockAdder.SetError(fakeError)
+		mockAdder.SetError(test_helpers.FakeError)
 		mockDecoder := test_helpers.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, mockDecoder)
@@ -60,6 +56,6 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 		_, err := dagPutter.DagPut([]byte{1, 2, 3, 4, 5})
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError(fakeError))
+		Expect(err).To(MatchError(test_helpers.FakeError))
 	})
 })

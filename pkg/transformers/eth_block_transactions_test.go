@@ -1,7 +1,6 @@
 package transformers_test
 
 import (
-	"errors"
 	"io/ioutil"
 	"log"
 
@@ -34,8 +33,7 @@ var _ = Describe("Eth block transactions transformer", func() {
 
 		It("returns error if fetching rlp returns error", func() {
 			mockDatabase := test_helpers.NewMockDatabase()
-			fakeError := errors.New("failed")
-			mockDatabase.SetGetBlockBodyByBlockNumberError(fakeError)
+			mockDatabase.SetGetBlockBodyByBlockNumberError(test_helpers.FakeError)
 			mockPublisher := test_helpers.NewMockPublisher()
 			transformer := transformers.NewEthBlockTransactionsTransformer(mockDatabase, mockPublisher)
 			blockNumber := int64(1234567)
@@ -43,7 +41,7 @@ var _ = Describe("Eth block transactions transformer", func() {
 			err := transformer.Execute(blockNumber, blockNumber)
 
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(transformers.NewExecuteError(transformers.GetBlockRlpErr, fakeError)))
+			Expect(err).To(MatchError(transformers.NewExecuteError(transformers.GetBlockRlpErr, test_helpers.FakeError)))
 		})
 
 		It("publishes block body data to IPFS", func() {
@@ -66,15 +64,14 @@ var _ = Describe("Eth block transactions transformer", func() {
 			fakeRawData := [][]byte{{1, 2, 3, 4, 5}}
 			mockDatabase.SetGetBlockBodyByBlockNumberReturnBytes(fakeRawData)
 			mockPublisher := test_helpers.NewMockPublisher()
-			fakeError := errors.New("failed")
-			mockPublisher.SetError(fakeError)
+			mockPublisher.SetError(test_helpers.FakeError)
 			transformer := transformers.NewEthBlockTransactionsTransformer(mockDatabase, mockPublisher)
 			blockNumber := int64(1234567)
 
 			err := transformer.Execute(blockNumber, blockNumber)
 
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(transformers.NewExecuteError(transformers.PutIpldErr, fakeError)))
+			Expect(err).To(MatchError(transformers.NewExecuteError(transformers.PutIpldErr, test_helpers.FakeError)))
 		})
 	})
 
