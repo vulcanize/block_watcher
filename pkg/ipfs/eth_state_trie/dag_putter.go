@@ -1,8 +1,8 @@
 package eth_state_trie
 
 import (
-	"github.com/vulcanize/block_watcher/pkg/ipfs"
-	"github.com/vulcanize/block_watcher/pkg/ipfs/util"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/util"
 )
 
 const (

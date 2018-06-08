@@ -19,10 +19,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vulcanize/block_watcher/pkg/db"
-	"github.com/vulcanize/block_watcher/pkg/ipfs"
-	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_block_header"
-	"github.com/vulcanize/block_watcher/pkg/transformers"
+	"github.com/vulcanize/eth-block-extractor/pkg/db"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_block_header"
+	"github.com/vulcanize/eth-block-extractor/pkg/transformers"
 )
 
 // createIpldForBlockHeaderCmd represents the createIpldForBlockHeader command
@@ -31,7 +31,7 @@ var createIpldForBlockHeaderCmd = &cobra.Command{
 	Short: "Create an IPLD object for a block.",
 	Long: `Create an IPLD object for a block.
 
-e.g. ./block_watcher createIpldForBlockHeader -b 1234567
+e.g. ./eth-block-extractor createIpldForBlockHeader -b 1234567
 
 Under the hood, the command fetches the block header RLP data from LevelDB and
 puts it in IPFS, converting the data as an 'eth-block'`,

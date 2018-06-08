@@ -9,11 +9,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/vulcanize/block_watcher/pkg/db/level"
-	"github.com/vulcanize/block_watcher/test_helpers"
-	"github.com/vulcanize/block_watcher/test_helpers/mocks/wrappers/core"
-	state_wrapper "github.com/vulcanize/block_watcher/test_helpers/mocks/wrappers/core/state"
-	"github.com/vulcanize/block_watcher/test_helpers/mocks/wrappers/trie"
+	"github.com/vulcanize/eth-block-extractor/pkg/db/level"
+	"github.com/vulcanize/eth-block-extractor/test_helpers"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/core"
+	state_wrapper "github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/core/state"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/trie"
 )
 
 var _ = Describe("", func() {

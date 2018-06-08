@@ -4,9 +4,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_state_trie"
-	"github.com/vulcanize/block_watcher/test_helpers"
-	"github.com/vulcanize/block_watcher/test_helpers/mocks/ipfs"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_state_trie"
+	"github.com/vulcanize/eth-block-extractor/test_helpers"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
 )
 
 var _ = Describe("Ethereum state trie node dag putter", func() {

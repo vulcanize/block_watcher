@@ -19,10 +19,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vulcanize/block_watcher/pkg/db"
-	"github.com/vulcanize/block_watcher/pkg/ipfs"
-	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_block_transactions"
-	"github.com/vulcanize/block_watcher/pkg/transformers"
+	"github.com/vulcanize/eth-block-extractor/pkg/db"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_block_transactions"
+	"github.com/vulcanize/eth-block-extractor/pkg/transformers"
 )
 
 // createIpldsForBlockTransactionsCmd represents the createIpldsForBlockTransactions command
@@ -31,7 +31,7 @@ var createIpldsForBlockTransactionsCmd = &cobra.Command{
 	Short: "Create IPLDs for every transaction in a block",
 	Long: `Create an IPLD for every transaction in a block. For example:
 
-./block_watcher createIpldsForBlockTransactions --config environments/public.toml --block-number 5000000
+./eth-block-extractor createIpldsForBlockTransactions --config environments/public.toml --block-number 5000000
 
 The block number specifies the block for which to create transaction IPLDs, and is required.`,
 	Run: func(cmd *cobra.Command, args []string) {

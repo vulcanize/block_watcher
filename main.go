@@ -1,6 +1,6 @@
 package main
 
-import "github.com/vulcanize/block_watcher/cmd"
+import "github.com/vulcanize/eth-block-extractor/cmd"
 
 func main() {
 	cmd.Execute()

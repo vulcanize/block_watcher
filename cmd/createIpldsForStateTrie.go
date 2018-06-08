@@ -19,10 +19,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vulcanize/block_watcher/pkg/db"
-	"github.com/vulcanize/block_watcher/pkg/ipfs"
-	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_state_trie"
-	"github.com/vulcanize/block_watcher/pkg/transformers"
+	"github.com/vulcanize/eth-block-extractor/pkg/db"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_state_trie"
+	"github.com/vulcanize/eth-block-extractor/pkg/transformers"
 )
 
 // createIpldsForStateTrieCmd represents the createIpldsForStateTrie command
@@ -31,7 +31,7 @@ var createIpldsForStateTrieCmd = &cobra.Command{
 	Short: "Create iplds for every ethereum state trie node",
 	Long: `Create iplds for every ethereum state trie node. For example:
 
-./block_watcher createIpldsForStateTrie
+./eth-block-extractor createIpldsForStateTrie
 
 Note that this operation is very expensive in terms of both cpu and disk,
 as it is reconstructing the entire ethereum state trie in the same fashion

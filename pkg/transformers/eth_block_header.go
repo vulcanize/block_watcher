@@ -3,8 +3,8 @@ package transformers
 import (
 	"log"
 
-	"github.com/vulcanize/block_watcher/pkg/db"
-	"github.com/vulcanize/block_watcher/pkg/ipfs"
+	"github.com/vulcanize/eth-block-extractor/pkg/db"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
 )
 
 type EthBlockHeaderTransformer struct {

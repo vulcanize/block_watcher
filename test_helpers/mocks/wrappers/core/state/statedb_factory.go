@@ -4,7 +4,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/state"
 	. "github.com/onsi/gomega"
-	state_wrapper "github.com/vulcanize/block_watcher/pkg/wrappers/core/state"
+	state_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
 )
 
 type MockStateDBFactory struct {

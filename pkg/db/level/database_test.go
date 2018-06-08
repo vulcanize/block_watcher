@@ -6,9 +6,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/vulcanize/block_watcher/pkg/db/level"
-	"github.com/vulcanize/block_watcher/test_helpers"
-	level_wrapper "github.com/vulcanize/block_watcher/test_helpers/mocks/db/level"
+	"github.com/vulcanize/eth-block-extractor/pkg/db/level"
+	"github.com/vulcanize/eth-block-extractor/test_helpers"
+	level_wrapper "github.com/vulcanize/eth-block-extractor/test_helpers/mocks/db/level"
 )
 
 var _ = Describe("Database", func() {

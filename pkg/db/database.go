@@ -6,9 +6,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/vulcanize/block_watcher/pkg/db/level"
-	"github.com/vulcanize/block_watcher/pkg/wrappers/core"
-	"github.com/vulcanize/block_watcher/pkg/wrappers/core/state"
+	"github.com/vulcanize/eth-block-extractor/pkg/db/level"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
 )
 
 var ErrNoSuchDb = errors.New("no such database")

@@ -5,9 +5,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/trie"
-	state_wrapper "github.com/vulcanize/block_watcher/pkg/wrappers/core/state"
-	trie_wrapper "github.com/vulcanize/block_watcher/pkg/wrappers/trie"
-	"github.com/vulcanize/block_watcher/test_helpers"
+	state_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
+	trie_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/trie"
+	"github.com/vulcanize/eth-block-extractor/test_helpers"
 )
 
 type MockStateDatabase struct {

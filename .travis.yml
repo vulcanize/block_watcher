@@ -3,7 +3,7 @@ language: go
 go:
   - 1.9
   
-go_import_path: github.com/vulcanize/block_watcher
+go_import_path: github.com/vulcanize/eth-block-extractor
 
 before_install:
   # ginkgo golint dep

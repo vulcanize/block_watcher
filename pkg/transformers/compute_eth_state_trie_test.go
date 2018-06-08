@@ -9,10 +9,10 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/vulcanize/block_watcher/pkg/transformers"
-	"github.com/vulcanize/block_watcher/test_helpers"
-	"github.com/vulcanize/block_watcher/test_helpers/mocks/db"
-	"github.com/vulcanize/block_watcher/test_helpers/mocks/ipfs"
+	"github.com/vulcanize/eth-block-extractor/pkg/transformers"
+	"github.com/vulcanize/eth-block-extractor/test_helpers"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/db"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
 )
 
 var _ = Describe("Compute historical state transformer", func() {
