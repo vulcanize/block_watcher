@@ -9,48 +9,50 @@ import (
 
 	"github.com/vulcanize/block_watcher/pkg/transformers"
 	"github.com/vulcanize/block_watcher/test_helpers"
+	"github.com/vulcanize/block_watcher/test_helpers/mocks/db"
+	"github.com/vulcanize/block_watcher/test_helpers/mocks/ipfs"
 )
 
 var _ = Describe("EthBlockHeaderTransformer", func() {
-	var mockDatabase *test_helpers.MockDatabase
-	var mockPublisher *test_helpers.MockPublisher
+	var mockDB *db.MockDatabase
+	var mockPublisher *ipfs.MockPublisher
 
 	Describe("Fetching one block header", func() {
 		var fakeBytes []byte
 		var blockNumber int64
 
 		BeforeEach(func() {
-			mockDatabase = test_helpers.NewMockDatabase()
-			mockPublisher = test_helpers.NewMockPublisher()
+			mockDB = db.NewMockDatabase()
+			mockPublisher = ipfs.NewMockPublisher()
 			blockNumber = 54321
 			fakeBytes = []byte{6, 7, 8, 9, 0}
-			mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeBytes})
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeBytes})
 			mockPublisher.SetReturnStrings([][]string{{"cid_one", "cid_two"}})
 			log.SetOutput(ioutil.Discard)
 		})
 
 		It("Fetches RLP data from ethereum db", func() {
-			transformer := transformers.NewEthBlockHeaderTransformer(mockDatabase, mockPublisher)
+			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
 
 			err := transformer.Execute(blockNumber, blockNumber)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockDatabase.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
+			mockDB.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
 		})
 
 		It("Returns error if fetching block RLP data from ethereum DB fails", func() {
-			mockDatabase.SetGetBlockHeaderByBlockNumberError(test_helpers.FakeError)
-			transformer := transformers.NewEthBlockHeaderTransformer(mockDatabase, mockPublisher)
+			mockDB.SetGetBlockHeaderByBlockNumberError(test_helpers.FakeError)
+			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
 
 			err := transformer.Execute(blockNumber, blockNumber)
 
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(transformers.NewExecuteError(transformers.GetBlockRlpErr, test_helpers.FakeError)))
-			mockDatabase.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
+			mockDB.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
 		})
 
 		It("Persists block RLP data to IPFS", func() {
-			transformer := transformers.NewEthBlockHeaderTransformer(mockDatabase, mockPublisher)
+			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
 
 			err := transformer.Execute(blockNumber, blockNumber)
 
@@ -60,13 +62,13 @@ var _ = Describe("EthBlockHeaderTransformer", func() {
 
 		It("Returns err if persisting block RLP data to IPFS fails", func() {
 			mockPublisher.SetError(test_helpers.FakeError)
-			transformer := transformers.NewEthBlockHeaderTransformer(mockDatabase, mockPublisher)
+			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
 
 			err := transformer.Execute(blockNumber, blockNumber)
 
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(transformers.NewExecuteError(transformers.PutIpldErr, test_helpers.FakeError)))
-			mockDatabase.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
+			mockDB.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
 			mockPublisher.AssertWriteCalledWith([][]byte{fakeBytes})
 		})
 	})
@@ -77,28 +79,28 @@ var _ = Describe("EthBlockHeaderTransformer", func() {
 		var endingBlockNumber int64
 
 		BeforeEach(func() {
-			mockDatabase = test_helpers.NewMockDatabase()
-			mockPublisher = test_helpers.NewMockPublisher()
+			mockDB = db.NewMockDatabase()
+			mockPublisher = ipfs.NewMockPublisher()
 			startingBlockNumber = 54321
 			endingBlockNumber = 54322
 			fakeRlpBytes = []byte{6, 7, 8, 9, 0}
-			mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeRlpBytes, fakeRlpBytes})
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeRlpBytes, fakeRlpBytes})
 			fakeOutputString := []string{"cid_one", "cid_two"}
 			mockPublisher.SetReturnStrings([][]string{fakeOutputString, fakeOutputString})
 			log.SetOutput(ioutil.Discard)
 		})
 
 		It("Fetches block RLP data from ethereum db for every block in range", func() {
-			transformer := transformers.NewEthBlockHeaderTransformer(mockDatabase, mockPublisher)
+			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
 
 			err := transformer.Execute(startingBlockNumber, endingBlockNumber)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockDatabase.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{startingBlockNumber, endingBlockNumber})
+			mockDB.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{startingBlockNumber, endingBlockNumber})
 		})
 
 		It("Persists block RLP data to IPFS for every block in range", func() {
-			transformer := transformers.NewEthBlockHeaderTransformer(mockDatabase, mockPublisher)
+			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
 
 			err := transformer.Execute(startingBlockNumber, endingBlockNumber)
 

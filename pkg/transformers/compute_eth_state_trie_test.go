@@ -11,6 +11,8 @@ import (
 
 	"github.com/vulcanize/block_watcher/pkg/transformers"
 	"github.com/vulcanize/block_watcher/test_helpers"
+	"github.com/vulcanize/block_watcher/test_helpers/mocks/db"
+	"github.com/vulcanize/block_watcher/test_helpers/mocks/ipfs"
 )
 
 var _ = Describe("Compute historical state transformer", func() {
@@ -20,27 +22,27 @@ var _ = Describe("Compute historical state transformer", func() {
 
 	Describe("publishing the state trie for the genesis block", func() {
 		It("fetches state trie root for genesis block", func() {
-			db := test_helpers.NewMockDatabase()
+			mockDB := db.NewMockDatabase()
 			fakeHeaderBytes := []byte{1, 2, 3, 4, 5}
-			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeHeaderBytes})
-			decoder := test_helpers.NewMockDecoder()
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeHeaderBytes})
+			decoder := db.NewMockDecoder()
 			decoder.SetReturnOut(&types.Header{})
-			publisher := test_helpers.NewMockPublisher()
-			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
+			publisher := ipfs.NewMockPublisher()
+			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, publisher)
 
 			err := transformer.Execute(0)
 
 			Expect(err).NotTo(HaveOccurred())
-			db.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{0})
+			mockDB.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{0})
 			decoder.AssertDecodeCalledWith(fakeHeaderBytes, &types.Header{})
 		})
 
 		It("returns error if fetching state trie root fails", func() {
-			db := test_helpers.NewMockDatabase()
-			db.SetGetBlockHeaderByBlockNumberError(test_helpers.FakeError)
-			decoder := test_helpers.NewMockDecoder()
-			publisher := test_helpers.NewMockPublisher()
-			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockHeaderByBlockNumberError(test_helpers.FakeError)
+			decoder := db.NewMockDecoder()
+			publisher := ipfs.NewMockPublisher()
+			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, publisher)
 
 			err := transformer.Execute(0)
 
@@ -49,27 +51,27 @@ var _ = Describe("Compute historical state transformer", func() {
 		})
 
 		It("fetches state trie nodes for genesis block with block state root", func() {
-			db := test_helpers.NewMockDatabase()
-			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-			decoder := test_helpers.NewMockDecoder()
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+			decoder := db.NewMockDecoder()
 			decoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
-			publisher := test_helpers.NewMockPublisher()
-			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
+			publisher := ipfs.NewMockPublisher()
+			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, publisher)
 
 			err := transformer.Execute(0)
 
 			Expect(err).NotTo(HaveOccurred())
-			db.AssertGetStateTrieNodesCalledWith(test_helpers.FakeHash.Bytes())
+			mockDB.AssertGetStateTrieNodesCalledWith(test_helpers.FakeHash.Bytes())
 		})
 
 		It("returns error if fetching state trie nodes fails", func() {
-			db := test_helpers.NewMockDatabase()
-			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-			db.SetGetStateTrieNodesError(test_helpers.FakeError)
-			decoder := test_helpers.NewMockDecoder()
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+			mockDB.SetGetStateTrieNodesError(test_helpers.FakeError)
+			decoder := db.NewMockDecoder()
 			decoder.SetReturnOut(&types.Header{})
-			publisher := test_helpers.NewMockPublisher()
-			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
+			publisher := ipfs.NewMockPublisher()
+			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, publisher)
 
 			err := transformer.Execute(0)
 
@@ -78,15 +80,15 @@ var _ = Describe("Compute historical state transformer", func() {
 		})
 
 		It("publishes state trie nodes for genesis block to IPFS", func() {
-			db := test_helpers.NewMockDatabase()
-			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 			fakeStateTrieNodes := [][]byte{{6, 7, 8, 9, 0}}
-			db.SetGetStateTrieNodesReturnBytes(fakeStateTrieNodes)
-			decoder := test_helpers.NewMockDecoder()
+			mockDB.SetGetStateTrieNodesReturnBytes(fakeStateTrieNodes)
+			decoder := db.NewMockDecoder()
 			decoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
-			publisher := test_helpers.NewMockPublisher()
+			publisher := ipfs.NewMockPublisher()
 			publisher.SetReturnStrings([][]string{{"one"}})
-			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
+			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, publisher)
 
 			err := transformer.Execute(0)
 
@@ -97,51 +99,51 @@ var _ = Describe("Compute historical state transformer", func() {
 
 	Describe("computing and publishing the state trie for subsequent blocks", func() {
 		It("fetches the current and parent block", func() {
-			db := test_helpers.NewMockDatabase()
-			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-			db.SetGetStateTrieNodesReturnBytes([][]byte{{6, 7, 8, 9, 0}})
-			decoder := test_helpers.NewMockDecoder()
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+			mockDB.SetGetStateTrieNodesReturnBytes([][]byte{{6, 7, 8, 9, 0}})
+			decoder := db.NewMockDecoder()
 			decoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
-			publisher := test_helpers.NewMockPublisher()
+			publisher := ipfs.NewMockPublisher()
 			publisher.SetReturnStrings([][]string{{"one"}})
-			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
+			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, publisher)
 
 			err := transformer.Execute(4)
 
 			Expect(err).NotTo(HaveOccurred())
-			db.AssertGetBlockByBlockNumberCalledwith([]int64{0, 1, 2, 3, 4})
+			mockDB.AssertGetBlockByBlockNumberCalledwith([]int64{0, 1, 2, 3, 4})
 		})
 
 		It("computes state trie nodes for current block", func() {
-			db := test_helpers.NewMockDatabase()
-			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-			db.SetGetStateTrieNodesReturnBytes([][]byte{{6, 7, 8, 9, 0}})
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+			mockDB.SetGetStateTrieNodesReturnBytes([][]byte{{6, 7, 8, 9, 0}})
 			fakeBlock := &types.Block{}
-			db.SetGetBlockByBlockNumberReturnBlock(fakeBlock)
-			decoder := test_helpers.NewMockDecoder()
+			mockDB.SetGetBlockByBlockNumberReturnBlock(fakeBlock)
+			decoder := db.NewMockDecoder()
 			decoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
-			publisher := test_helpers.NewMockPublisher()
+			publisher := ipfs.NewMockPublisher()
 			publisher.SetReturnStrings([][]string{{"one"}})
-			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
+			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, publisher)
 
 			err := transformer.Execute(1)
 
 			Expect(err).NotTo(HaveOccurred())
-			db.AssertComputeBlockStateTrieCalledWith(fakeBlock, fakeBlock)
+			mockDB.AssertComputeBlockStateTrieCalledWith(fakeBlock, fakeBlock)
 		})
 
 		It("publishes state trie nodes to IPFS", func() {
-			db := test_helpers.NewMockDatabase()
-			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 			genesisBlockStateTrieNodes := [][]byte{{6, 7, 8, 9, 0}}
-			db.SetGetStateTrieNodesReturnBytes(genesisBlockStateTrieNodes)
+			mockDB.SetGetStateTrieNodesReturnBytes(genesisBlockStateTrieNodes)
 			subsequentBlocksStateTrieNodes := [][]byte{{1, 1, 1, 1, 1}, {2, 2, 2, 2, 2}}
-			db.SetComputeBlockStateTrieReturnBytes(subsequentBlocksStateTrieNodes)
-			decoder := test_helpers.NewMockDecoder()
+			mockDB.SetComputeBlockStateTrieReturnBytes(subsequentBlocksStateTrieNodes)
+			decoder := db.NewMockDecoder()
 			decoder.SetReturnOut(&types.Header{Root: common.HexToHash("0x123")})
-			publisher := test_helpers.NewMockPublisher()
+			publisher := ipfs.NewMockPublisher()
 			publisher.SetReturnStrings([][]string{{"one"}, {"two"}, {"three"}})
-			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
+			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, publisher)
 
 			err := transformer.Execute(1)
 

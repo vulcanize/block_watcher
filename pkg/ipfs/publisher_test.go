@@ -5,11 +5,12 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/vulcanize/block_watcher/pkg/ipfs"
 	"github.com/vulcanize/block_watcher/test_helpers"
+	ipfs_wrapper "github.com/vulcanize/block_watcher/test_helpers/mocks/ipfs"
 )
 
 var _ = Describe("IPFS publisher", func() {
 	It("calls dag put with the passed data", func() {
-		mockDagPutter := test_helpers.NewMockDagPutter()
+		mockDagPutter := ipfs_wrapper.NewMockDagPutter()
 		publisher := ipfs.NewIpfsPublisher(mockDagPutter)
 		fakeBytes := []byte{1, 2, 3, 4, 5}
 
@@ -21,7 +22,7 @@ var _ = Describe("IPFS publisher", func() {
 	})
 
 	It("returns error if dag put fails", func() {
-		mockDagPutter := test_helpers.NewMockDagPutter()
+		mockDagPutter := ipfs_wrapper.NewMockDagPutter()
 		mockDagPutter.SetError(test_helpers.FakeError)
 		publisher := ipfs.NewIpfsPublisher(mockDagPutter)
 

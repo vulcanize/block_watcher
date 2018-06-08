@@ -7,7 +7,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/vulcanize/block_watcher/pkg/db/level"
-	"github.com/vulcanize/block_watcher/pkg/db/level/state_computation"
+	"github.com/vulcanize/block_watcher/pkg/wrappers/core"
+	"github.com/vulcanize/block_watcher/pkg/wrappers/core/state"
 )
 
 var ErrNoSuchDb = errors.New("no such database")
@@ -48,15 +49,15 @@ func CreateDatabase(config DatabaseConfig) (Database, error) {
 	}
 }
 
-func createStateComputer(databaseConnection ethdb.Database) (state_computation.Computer, error) {
-	blockChain, err := state_computation.NewStateBlockChain(databaseConnection)
+func createStateComputer(databaseConnection ethdb.Database) (level.IStateComputer, error) {
+	blockChain, err := core.NewBlockChain(databaseConnection)
 	if err != nil {
 		return nil, err
 	}
-	db := state_computation.NewDatabase(databaseConnection)
-	processor := state_computation.NewStateProcessor(*blockChain)
-	trieFactory := state_computation.NewStateTrieFactory()
-	validator := state_computation.NewStateValidator(*blockChain)
-	computer := state_computation.NewStateComputer(blockChain, db, processor, trieFactory, validator)
+	db := state.NewDatabase(databaseConnection)
+	processor := core.NewStateProcessor(*blockChain)
+	trieFactory := state.NewStateDBFactory()
+	validator := core.NewBlockValidator(*blockChain)
+	computer := level.NewStateComputer(blockChain, db, processor, trieFactory, validator)
 	return computer, nil
 }

@@ -3,15 +3,14 @@ package level
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/vulcanize/block_watcher/pkg/db/level/state_computation"
 )
 
 type Database struct {
 	reader        Reader
-	stateComputer state_computation.Computer
+	stateComputer IStateComputer
 }
 
-func NewLevelDatabase(ldbReader Reader, stateComputer state_computation.Computer) *Database {
+func NewLevelDatabase(ldbReader Reader, stateComputer IStateComputer) *Database {
 	return &Database{
 		reader:        ldbReader,
 		stateComputer: stateComputer,

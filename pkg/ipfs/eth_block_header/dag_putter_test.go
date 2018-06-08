@@ -7,13 +7,15 @@ import (
 
 	"github.com/vulcanize/block_watcher/pkg/ipfs/eth_block_header"
 	"github.com/vulcanize/block_watcher/test_helpers"
+	"github.com/vulcanize/block_watcher/test_helpers/mocks/db"
+	"github.com/vulcanize/block_watcher/test_helpers/mocks/ipfs"
 )
 
 var _ = Describe("Creating an IPLD for a block header", func() {
 	It("decodes passed bytes into ethereum block header", func() {
-		mockDecoder := test_helpers.NewMockDecoder()
+		mockDecoder := db.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
-		dagPutter := eth_block_header.NewBlockHeaderDagPutter(test_helpers.NewMockAdder(), mockDecoder)
+		dagPutter := eth_block_header.NewBlockHeaderDagPutter(ipfs.NewMockAdder(), mockDecoder)
 		fakeBytes := []byte{1, 2, 3, 4, 5}
 
 		_, err := dagPutter.DagPut(fakeBytes)
@@ -23,9 +25,9 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 	})
 
 	It("returns error if decoding fails", func() {
-		mockDecoder := test_helpers.NewMockDecoder()
+		mockDecoder := db.NewMockDecoder()
 		mockDecoder.SetError(test_helpers.FakeError)
-		dagPutter := eth_block_header.NewBlockHeaderDagPutter(test_helpers.NewMockAdder(), mockDecoder)
+		dagPutter := eth_block_header.NewBlockHeaderDagPutter(ipfs.NewMockAdder(), mockDecoder)
 
 		_, err := dagPutter.DagPut([]byte{1, 2, 3, 4, 5})
 
@@ -34,8 +36,8 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 	})
 
 	It("adds ethereum block header to ipfs", func() {
-		mockAdder := test_helpers.NewMockAdder()
-		mockDecoder := test_helpers.NewMockDecoder()
+		mockAdder := ipfs.NewMockAdder()
+		mockDecoder := db.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, mockDecoder)
 		fakeBytes := []byte{1, 2, 3, 4, 5}
@@ -47,9 +49,9 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 	})
 
 	It("returns error if adding to ipfs fails", func() {
-		mockAdder := test_helpers.NewMockAdder()
+		mockAdder := ipfs.NewMockAdder()
 		mockAdder.SetError(test_helpers.FakeError)
-		mockDecoder := test_helpers.NewMockDecoder()
+		mockDecoder := db.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, mockDecoder)
 

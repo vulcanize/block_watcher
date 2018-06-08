@@ -9,6 +9,8 @@ import (
 
 	"github.com/vulcanize/block_watcher/pkg/transformers"
 	"github.com/vulcanize/block_watcher/test_helpers"
+	"github.com/vulcanize/block_watcher/test_helpers/mocks/db"
+	"github.com/vulcanize/block_watcher/test_helpers/mocks/ipfs"
 )
 
 var _ = Describe("Eth block transactions transformer", func() {
@@ -18,24 +20,24 @@ var _ = Describe("Eth block transactions transformer", func() {
 		})
 
 		It("fetches rlp data for block body", func() {
-			mockDatabase := test_helpers.NewMockDatabase()
-			mockDatabase.SetGetBlockBodyByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-			mockPublisher := test_helpers.NewMockPublisher()
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockBodyByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+			mockPublisher := ipfs.NewMockPublisher()
 			mockPublisher.SetReturnStrings([][]string{{"cid"}})
-			transformer := transformers.NewEthBlockTransactionsTransformer(mockDatabase, mockPublisher)
+			transformer := transformers.NewEthBlockTransactionsTransformer(mockDB, mockPublisher)
 			blockNumber := int64(1234567)
 
 			err := transformer.Execute(blockNumber, blockNumber)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockDatabase.AssertGetBlockBodyByBlockNumberCalledWith([]int64{blockNumber})
+			mockDB.AssertGetBlockBodyByBlockNumberCalledWith([]int64{blockNumber})
 		})
 
 		It("returns error if fetching rlp returns error", func() {
-			mockDatabase := test_helpers.NewMockDatabase()
-			mockDatabase.SetGetBlockBodyByBlockNumberError(test_helpers.FakeError)
-			mockPublisher := test_helpers.NewMockPublisher()
-			transformer := transformers.NewEthBlockTransactionsTransformer(mockDatabase, mockPublisher)
+			mockDB := db.NewMockDatabase()
+			mockDB.SetGetBlockBodyByBlockNumberError(test_helpers.FakeError)
+			mockPublisher := ipfs.NewMockPublisher()
+			transformer := transformers.NewEthBlockTransactionsTransformer(mockDB, mockPublisher)
 			blockNumber := int64(1234567)
 
 			err := transformer.Execute(blockNumber, blockNumber)
@@ -45,12 +47,12 @@ var _ = Describe("Eth block transactions transformer", func() {
 		})
 
 		It("publishes block body data to IPFS", func() {
-			mockDatabase := test_helpers.NewMockDatabase()
+			mockDB := db.NewMockDatabase()
 			fakeRawData := [][]byte{{1, 2, 3, 4, 5}}
-			mockDatabase.SetGetBlockBodyByBlockNumberReturnBytes(fakeRawData)
-			mockPublisher := test_helpers.NewMockPublisher()
+			mockDB.SetGetBlockBodyByBlockNumberReturnBytes(fakeRawData)
+			mockPublisher := ipfs.NewMockPublisher()
 			mockPublisher.SetReturnStrings([][]string{{"cid"}})
-			transformer := transformers.NewEthBlockTransactionsTransformer(mockDatabase, mockPublisher)
+			transformer := transformers.NewEthBlockTransactionsTransformer(mockDB, mockPublisher)
 			blockNumber := int64(1234567)
 
 			err := transformer.Execute(blockNumber, blockNumber)
@@ -60,12 +62,12 @@ var _ = Describe("Eth block transactions transformer", func() {
 		})
 
 		It("returns error if publishing data returns error", func() {
-			mockDatabase := test_helpers.NewMockDatabase()
+			mockDB := db.NewMockDatabase()
 			fakeRawData := [][]byte{{1, 2, 3, 4, 5}}
-			mockDatabase.SetGetBlockBodyByBlockNumberReturnBytes(fakeRawData)
-			mockPublisher := test_helpers.NewMockPublisher()
+			mockDB.SetGetBlockBodyByBlockNumberReturnBytes(fakeRawData)
+			mockPublisher := ipfs.NewMockPublisher()
 			mockPublisher.SetError(test_helpers.FakeError)
-			transformer := transformers.NewEthBlockTransactionsTransformer(mockDatabase, mockPublisher)
+			transformer := transformers.NewEthBlockTransactionsTransformer(mockDB, mockPublisher)
 			blockNumber := int64(1234567)
 
 			err := transformer.Execute(blockNumber, blockNumber)
@@ -77,9 +79,9 @@ var _ = Describe("Eth block transactions transformer", func() {
 
 	Describe("executing on a range of blocks", func() {
 		It("fetches rlp data for every block's body", func() {
-			mockDatabase := test_helpers.NewMockDatabase()
+			mockDatabase := db.NewMockDatabase()
 			mockDatabase.SetGetBlockBodyByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 0}})
-			mockPublisher := test_helpers.NewMockPublisher()
+			mockPublisher := ipfs.NewMockPublisher()
 			mockPublisher.SetReturnStrings([][]string{{"cid_one"}, {"cid_two"}})
 			transformer := transformers.NewEthBlockTransactionsTransformer(mockDatabase, mockPublisher)
 			startingBlockNumber := int64(1234567)
@@ -92,10 +94,10 @@ var _ = Describe("Eth block transactions transformer", func() {
 		})
 
 		It("publishes every block body's data to IPFS", func() {
-			mockDatabase := test_helpers.NewMockDatabase()
+			mockDatabase := db.NewMockDatabase()
 			fakeRawData := [][]byte{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 0}}
 			mockDatabase.SetGetBlockBodyByBlockNumberReturnBytes(fakeRawData)
-			mockPublisher := test_helpers.NewMockPublisher()
+			mockPublisher := ipfs.NewMockPublisher()
 			mockPublisher.SetReturnStrings([][]string{{"cid_one"}, {"cid_two"}})
 			transformer := transformers.NewEthBlockTransactionsTransformer(mockDatabase, mockPublisher)
 			startingBlockNumber := int64(1234567)
