@@ -5,14 +5,20 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/vulcanize/block_watcher/pkg/db/level/state_computation"
+	"github.com/vulcanize/block_watcher/test_helpers"
 )
 
 type MockStateDatabase struct {
 	returnDB state.Database
+	trie     state_computation.ITrie
 }
 
 func NewMockStateDatabase() *MockStateDatabase {
-	return &MockStateDatabase{}
+	return &MockStateDatabase{
+		returnDB: nil,
+		trie:     nil,
+	}
 }
 
 func (msdb *MockStateDatabase) CreateFakeUnderlyingDatabase() state.Database {
@@ -23,11 +29,19 @@ func (msdb *MockStateDatabase) SetReturnDatabase(db state.Database) {
 	msdb.returnDB = db
 }
 
+func (msdb *MockStateDatabase) SetReturnTrie(trie state_computation.ITrie) {
+	msdb.trie = trie
+}
+
 func (msdb *MockStateDatabase) Database() state.Database {
 	return msdb.returnDB
 }
 
-func (msdb *MockStateDatabase) TrieDB() *trie.Database {
+func (msdb *MockStateDatabase) OpenTrie(root common.Hash) (state_computation.ITrie, error) {
+	return msdb.trie, nil
+}
+
+func (msdb *MockStateDatabase) TrieDB() state_computation.ITrieDatabase {
 	return msdb.returnDB.TrieDB()
 }
 
@@ -52,12 +66,12 @@ func (*mockStateDatabase) OpenStorageTrie(addrHash, root common.Hash) (state.Tri
 }
 
 func (*mockStateDatabase) OpenTrie(root common.Hash) (state.Trie, error) {
-	panic("implement me")
+	return &trie.SecureTrie{}, nil
 }
 
 func (*mockStateDatabase) TrieDB() *trie.Database {
 	trieDB := trie.NewDatabase(&mockEthDB{})
-	trieDB.Insert(common.HexToHash("0x123"), []byte{1, 2, 3, 4, 5})
+	trieDB.Insert(test_helpers.FakeHash, []byte{1, 2, 3, 4, 5})
 	return trieDB
 }
 

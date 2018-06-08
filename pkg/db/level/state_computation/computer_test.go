@@ -16,10 +16,10 @@ import (
 
 var _ = Describe("", func() {
 	It("initializes state trie at parent block's root", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
+		chain, db, processor, trieFactory, validator := getMocks()
 		fakeDB := db.CreateFakeUnderlyingDatabase()
 		db.SetReturnDatabase(fakeDB)
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		_, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -29,9 +29,9 @@ var _ = Describe("", func() {
 	})
 
 	It("returns error if state trie initialization fails", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
+		chain, db, processor, trieFactory, validator := getMocks()
 		trieFactory.SetReturnErr(test_helpers.FakeError)
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		_, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -41,12 +41,12 @@ var _ = Describe("", func() {
 	})
 
 	It("processes the block to build the state trie", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
-		stateTrie := state_mocks.NewMockStateTrie()
+		chain, db, processor, trieFactory, validator := getMocks()
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
+		stateTrie := state_mocks.NewMockStateDB()
 		fakeStateDB := &state.StateDB{}
-		stateTrie.SetStateDb(fakeStateDB)
-		trieFactory.SetStateTrie(stateTrie)
+		stateTrie.SetStateDB(fakeStateDB)
+		trieFactory.SetStateDB(stateTrie)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		_, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -56,9 +56,9 @@ var _ = Describe("", func() {
 	})
 
 	It("returns error if processing block fails", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
+		chain, db, processor, trieFactory, validator := getMocks()
 		processor.SetReturnErr(test_helpers.FakeError)
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		_, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -68,16 +68,16 @@ var _ = Describe("", func() {
 	})
 
 	It("validates state computed by processing blocks", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
+		chain, db, processor, trieFactory, validator := getMocks()
 		fakeReceipts := types.Receipts{}
 		processor.SetReturnReceipts(fakeReceipts)
 		fakeUsedGas := uint64(1234)
 		processor.SetReturnUsedGas(fakeUsedGas)
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
-		stateTrie := state_mocks.NewMockStateTrie()
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
+		stateTrie := state_mocks.NewMockStateDB()
 		fakeStateDB := &state.StateDB{}
-		stateTrie.SetStateDb(fakeStateDB)
-		trieFactory.SetStateTrie(stateTrie)
+		stateTrie.SetStateDB(fakeStateDB)
+		trieFactory.SetStateDB(stateTrie)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		_, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -87,9 +87,9 @@ var _ = Describe("", func() {
 	})
 
 	It("returns error if validating state fails", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
+		chain, db, processor, trieFactory, validator := getMocks()
 		validator.SetReturnErr(test_helpers.FakeError)
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		_, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -99,10 +99,10 @@ var _ = Describe("", func() {
 	})
 
 	It("commits validated state to memory database", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
-		stateTrie := state_mocks.NewMockStateTrie()
-		trieFactory.SetStateTrie(stateTrie)
+		chain, db, processor, trieFactory, validator := getMocks()
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
+		stateTrie := state_mocks.NewMockStateDB()
+		trieFactory.SetStateDB(stateTrie)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		_, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -112,11 +112,11 @@ var _ = Describe("", func() {
 	})
 
 	It("returns error if committing state fails", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
-		stateTrie := state_mocks.NewMockStateTrie()
+		chain, db, processor, trieFactory, validator := getMocks()
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
+		stateTrie := state_mocks.NewMockStateDB()
 		stateTrie.SetReturnErr(test_helpers.FakeError)
-		trieFactory.SetStateTrie(stateTrie)
+		trieFactory.SetStateDB(stateTrie)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		_, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -126,14 +126,13 @@ var _ = Describe("", func() {
 	})
 
 	It("returns nodes from memory database", func() {
-		chain, db, iteratorFactory, processor, trieFactory, validator := getMocks()
-		fakeDB := db.CreateFakeUnderlyingDatabase()
-		db.SetReturnDatabase(fakeDB)
-		iterator := state_mocks.NewMockStateIterator(2)
-		iterator.SetReturnHash(common.HexToHash("0x123"))
-		iteratorFactory.SetReturnIterator(iterator)
-		computer := state_computation.NewStateComputer(chain, db, iteratorFactory, processor, trieFactory, validator)
-
+		chain, db, processor, trieFactory, validator := getMocks()
+		computer := state_computation.NewStateComputer(chain, db, processor, trieFactory, validator)
+		fakeIterator := state_mocks.NewMockIterator(2)
+		fakeIterator.SetReturnHash(test_helpers.FakeHash)
+		fakeTrie := state_mocks.NewMockTrie()
+		fakeTrie.SetReturnIterator(fakeIterator)
+		db.SetReturnTrie(fakeTrie)
 		currentBlock, parentBlock := getFakeBlocks()
 
 		results, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
@@ -144,23 +143,26 @@ var _ = Describe("", func() {
 	})
 })
 
-func getMocks() (*test_helpers.MockBlockChain, *state_mocks.MockStateDatabase, *state_mocks.MockStateIteratorFactory, *test_helpers.MockProcessor, *state_mocks.MockStateTrieFactory, *test_helpers.MockValidator) {
+func getMocks() (*test_helpers.MockBlockChain, *state_mocks.MockStateDatabase, *test_helpers.MockProcessor, *state_mocks.MockStateDBFactory, *test_helpers.MockValidator) {
 	chain := test_helpers.NewMockBlockChain()
 	db := state_mocks.NewMockStateDatabase()
-	iteratorFactory := state_mocks.NewMockStateIteratorFactory()
-	iterator := state_mocks.NewMockStateIterator(1)
-	iteratorFactory.SetReturnIterator(iterator)
+	fakeDB := db.CreateFakeUnderlyingDatabase()
+	db.SetReturnDatabase(fakeDB)
+	fakeIterator := state_mocks.NewMockIterator(1)
+	fakeTrie := state_mocks.NewMockTrie()
+	fakeTrie.SetReturnIterator(fakeIterator)
+	db.SetReturnTrie(fakeTrie)
 	processor := test_helpers.NewMockProcessor()
-	trieFactory := state_mocks.NewMockStateTrieFactory()
-	stateTrie := state_mocks.NewMockStateTrie()
-	trieFactory.SetStateTrie(stateTrie)
+	trieFactory := state_mocks.NewMockStateDBFactory()
+	stateTrie := state_mocks.NewMockStateDB()
+	trieFactory.SetStateDB(stateTrie)
 	validator := test_helpers.NewMockValidator()
-	return chain, db, iteratorFactory, processor, trieFactory, validator
+	return chain, db, processor, trieFactory, validator
 }
 
 func getFakeBlocks() (*types.Block, *types.Block) {
 	currentBlockHeader := &types.Header{
-		Root:   common.HexToHash("0x123"),
+		Root:   test_helpers.FakeHash,
 		Number: big.NewInt(456),
 	}
 	currentBlock := types.NewBlockWithHeader(currentBlockHeader)

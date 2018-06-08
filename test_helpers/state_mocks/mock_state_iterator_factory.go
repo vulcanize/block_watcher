@@ -6,17 +6,17 @@ import (
 )
 
 type MockStateIteratorFactory struct {
-	returnIterator state_computation.Iterator
+	returnIterator state_computation.IIterator
 }
 
 func NewMockStateIteratorFactory() *MockStateIteratorFactory {
 	return &MockStateIteratorFactory{}
 }
 
-func (msif *MockStateIteratorFactory) SetReturnIterator(iterator state_computation.Iterator) {
+func (msif *MockStateIteratorFactory) SetReturnIterator(iterator state_computation.IIterator) {
 	msif.returnIterator = iterator
 }
 
-func (msif *MockStateIteratorFactory) NewNodeIterator(stateDB *state.StateDB) state_computation.Iterator {
+func (msif *MockStateIteratorFactory) NewNodeIterator(stateDB *state.StateDB) state_computation.IIterator {
 	return msif.returnIterator
 }

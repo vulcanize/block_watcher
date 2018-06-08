@@ -5,19 +5,19 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 )
 
-type Trie interface {
+type IStateDB interface {
 	Commit(deleteEmptyObjects bool) (common.Hash, error)
-	StateDb() *state.StateDB
+	StateDB() *state.StateDB
 }
 
-type StateTrie struct {
+type StateDB struct {
 	db *state.StateDB
 }
 
-func (st *StateTrie) StateDb() *state.StateDB {
+func (st *StateDB) StateDB() *state.StateDB {
 	return st.db
 }
 
-func (st *StateTrie) Commit(deleteEmptyObjects bool) (common.Hash, error) {
+func (st *StateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
 	return st.db.Commit(deleteEmptyObjects)
 }

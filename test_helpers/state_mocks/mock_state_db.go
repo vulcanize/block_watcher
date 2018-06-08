@@ -6,37 +6,37 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type MockStateTrie struct {
+type MockStateDB struct {
 	commitCalled bool
 	returnErr    error
 	stateDb      *state.StateDB
 }
 
-func NewMockStateTrie() *MockStateTrie {
-	return &MockStateTrie{
+func NewMockStateDB() *MockStateDB {
+	return &MockStateDB{
 		commitCalled: false,
 		returnErr:    nil,
 		stateDb:      nil,
 	}
 }
 
-func (mst *MockStateTrie) SetReturnErr(err error) {
+func (mst *MockStateDB) SetReturnErr(err error) {
 	mst.returnErr = err
 }
 
-func (mst *MockStateTrie) SetStateDb(db *state.StateDB) {
+func (mst *MockStateDB) SetStateDB(db *state.StateDB) {
 	mst.stateDb = db
 }
 
-func (mst *MockStateTrie) Commit(deleteEmptyObjects bool) (common.Hash, error) {
+func (mst *MockStateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
 	mst.commitCalled = true
 	return common.Hash{}, mst.returnErr
 }
 
-func (mst *MockStateTrie) StateDb() *state.StateDB {
+func (mst *MockStateDB) StateDB() *state.StateDB {
 	return mst.stateDb
 }
 
-func (mst *MockStateTrie) AssertCommitCalled() {
+func (mst *MockStateDB) AssertCommitCalled() {
 	Expect(mst.commitCalled).To(BeTrue())
 }

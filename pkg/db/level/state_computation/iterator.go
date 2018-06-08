@@ -2,26 +2,36 @@ package state_computation
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
-type Iterator interface {
-	Next() bool
+type IIterator interface {
 	Hash() common.Hash
+	Leaf() bool
+	LeafBlob() []byte
+	Next(bool) bool
 }
 
-type StateIterator struct {
-	iterator *state.NodeIterator
+type Iterator struct {
+	iterator trie.NodeIterator
 }
 
-func NewStateIterator(stateNodeIterator *state.NodeIterator) *StateIterator {
-	return &StateIterator{iterator: stateNodeIterator}
+func NewStateIterator(nodeIterator trie.NodeIterator) *Iterator {
+	return &Iterator{iterator: nodeIterator}
 }
 
-func (si *StateIterator) Next() bool {
-	return si.iterator.Next()
+func (si *Iterator) Hash() common.Hash {
+	return si.Hash()
 }
 
-func (si *StateIterator) Hash() common.Hash {
-	return si.iterator.Hash
+func (si *Iterator) Leaf() bool {
+	return si.Leaf()
+}
+
+func (si *Iterator) LeafBlob() []byte {
+	return si.LeafBlob()
+}
+
+func (si *Iterator) Next(b bool) bool {
+	return si.Next(b)
 }

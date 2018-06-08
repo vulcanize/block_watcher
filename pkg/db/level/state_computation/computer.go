@@ -10,69 +10,72 @@ type Computer interface {
 }
 
 type StateComputer struct {
-	blockChain      BlockChain
-	db              Database
-	iteratorFactory IteratorFactory
-	processor       Processor
-	trieFactory     TrieFactory
-	validator       Validator
+	blockChain  BlockChain
+	db          Database
+	processor   Processor
+	trieFactory IStateDBFactory
+	validator   Validator
 }
 
-func NewStateComputer(blockChain BlockChain, db Database, iteratorFactory IteratorFactory, processor Processor, trieFactory TrieFactory, validator Validator) *StateComputer {
+func NewStateComputer(blockChain BlockChain, db Database, processor Processor, trieFactory IStateDBFactory, validator Validator) *StateComputer {
 	return &StateComputer{
-		blockChain:      blockChain,
-		db:              db,
-		iteratorFactory: iteratorFactory,
-		processor:       processor,
-		trieFactory:     trieFactory,
-		validator:       validator,
+		blockChain:  blockChain,
+		db:          db,
+		processor:   processor,
+		trieFactory: trieFactory,
+		validator:   validator,
 	}
 }
 
 func (sc *StateComputer) ComputeBlockStateTrie(block, parent *types.Block) ([][]byte, error) {
-	stateTrie, err := sc.trieFactory.NewStateTrie(parent.Root(), sc.db.Database())
+	stateTrie, err := sc.trieFactory.NewStateDB(parent.Root(), sc.db.Database())
 	if err != nil {
 		return nil, err
 	}
 
-	err = sc.createStateTrieForBlock(block, parent, stateTrie)
+	root, err := sc.createStateTrieForBlock(block, parent, stateTrie)
 	if err != nil {
 		return nil, err
 	}
 
-	return sc.persistStateTrieNodes(stateTrie)
+	return sc.persistStateTrieNodes(root)
 }
 
-func (sc *StateComputer) createStateTrieForBlock(block, parent *types.Block, stateTrie Trie) error {
-	receipts, _, usedGas, err := sc.processor.Process(block, stateTrie.StateDb())
+func (sc *StateComputer) createStateTrieForBlock(block, parent *types.Block, stateTrie IStateDB) (common.Hash, error) {
+	var root common.Hash
+	receipts, _, usedGas, err := sc.processor.Process(block, stateTrie.StateDB())
 	if err != nil {
-		return err
+		return root, err
 	}
-	err = sc.validator.ValidateState(block, parent, stateTrie.StateDb(), receipts, usedGas)
+	err = sc.validator.ValidateState(block, parent, stateTrie.StateDB(), receipts, usedGas)
 	if err != nil {
-		return err
+		return root, err
 	}
-	_, err = stateTrie.Commit(sc.blockChain.Config().IsEIP158(block.Number()))
+	root, err = stateTrie.Commit(sc.blockChain.Config().IsEIP158(block.Number()))
 	if err != nil {
-		return err
+		return root, err
 	}
-	return nil
+	return root, nil
 }
 
-func (sc *StateComputer) persistStateTrieNodes(stateTrie Trie) ([][]byte, error) {
+func (sc *StateComputer) persistStateTrieNodes(root common.Hash) ([][]byte, error) {
 	var results [][]byte
-	iterator := sc.iteratorFactory.NewNodeIterator(stateTrie.StateDb())
-	for iterator.Next() {
-		hash := iterator.Hash()
-		// state trie nodes are sometimes null/empty
-		if common.EmptyHash(hash) {
-			continue
+	stateTrie, err := sc.db.OpenTrie(root)
+	if err != nil {
+		return nil, err
+	}
+	stateTrieIterator := stateTrie.NodeIterator(nil)
+	for stateTrieIterator.Next(true) {
+		if stateTrieIterator.Leaf() {
+			results = append(results, stateTrieIterator.LeafBlob())
+		} else {
+			nodeKey := stateTrieIterator.Hash()
+			node, err := sc.db.TrieDB().Node(nodeKey)
+			if err != nil {
+				return nil, err
+			}
+			results = append(results, node)
 		}
-		node, err := sc.db.TrieDB().Node(hash)
-		if err != nil {
-			return nil, err
-		}
-		results = append(results, node)
 	}
 	return results, nil
 }

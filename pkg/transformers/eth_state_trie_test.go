@@ -46,15 +46,14 @@ var _ = Describe("Ethereum state trie transformer", func() {
 		fakeHeader := []byte{6, 7, 8, 9, 0}
 		mockDatabase.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeHeader})
 		mockDecoder := test_helpers.NewMockDecoder()
-		rootHash := common.HexToHash("0x12345")
-		mockDecoder.SetReturnOut(&types.Header{Root: rootHash})
+		mockDecoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
 		transformer := transformers.NewEthStateTrieTransformer(mockDatabase, mockDecoder, test_helpers.NewMockPublisher())
 
 		err := transformer.Execute(0, 0)
 
 		Expect(err).NotTo(HaveOccurred())
 		mockDecoder.AssertDecodeCalledWith(fakeHeader, &types.Header{})
-		mockDatabase.AssertGetStateTrieNodesCalledWith(rootHash.Bytes())
+		mockDatabase.AssertGetStateTrieNodesCalledWith(test_helpers.FakeHash.Bytes())
 	})
 
 	It("returns err if fetching state trie returns err", func() {

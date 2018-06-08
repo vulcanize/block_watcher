@@ -54,10 +54,9 @@ func createStateComputer(databaseConnection ethdb.Database) (state_computation.C
 		return nil, err
 	}
 	db := state_computation.NewDatabase(databaseConnection)
-	iteratorFactory := state_computation.NewStateIteratorFactory()
 	processor := state_computation.NewStateProcessor(*blockChain)
 	trieFactory := state_computation.NewStateTrieFactory()
 	validator := state_computation.NewStateValidator(*blockChain)
-	computer := state_computation.NewStateComputer(blockChain, db, iteratorFactory, processor, trieFactory, validator)
+	computer := state_computation.NewStateComputer(blockChain, db, processor, trieFactory, validator)
 	return computer, nil
 }

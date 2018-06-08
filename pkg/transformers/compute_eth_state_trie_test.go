@@ -52,15 +52,14 @@ var _ = Describe("Compute historical state transformer", func() {
 			db := test_helpers.NewMockDatabase()
 			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 			decoder := test_helpers.NewMockDecoder()
-			fakeRoot := common.HexToHash("0x123")
-			decoder.SetReturnOut(&types.Header{Root: fakeRoot})
+			decoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
 			publisher := test_helpers.NewMockPublisher()
 			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
 
 			err := transformer.Execute(0)
 
 			Expect(err).NotTo(HaveOccurred())
-			db.AssertGetStateTrieNodesCalledWith(fakeRoot.Bytes())
+			db.AssertGetStateTrieNodesCalledWith(test_helpers.FakeHash.Bytes())
 		})
 
 		It("returns error if fetching state trie nodes fails", func() {
@@ -84,7 +83,7 @@ var _ = Describe("Compute historical state transformer", func() {
 			fakeStateTrieNodes := [][]byte{{6, 7, 8, 9, 0}}
 			db.SetGetStateTrieNodesReturnBytes(fakeStateTrieNodes)
 			decoder := test_helpers.NewMockDecoder()
-			decoder.SetReturnOut(&types.Header{Root: common.HexToHash("0x123")})
+			decoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
 			publisher := test_helpers.NewMockPublisher()
 			publisher.SetReturnStrings([][]string{{"one"}})
 			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
@@ -102,7 +101,7 @@ var _ = Describe("Compute historical state transformer", func() {
 			db.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 			db.SetGetStateTrieNodesReturnBytes([][]byte{{6, 7, 8, 9, 0}})
 			decoder := test_helpers.NewMockDecoder()
-			decoder.SetReturnOut(&types.Header{Root: common.HexToHash("0x123")})
+			decoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
 			publisher := test_helpers.NewMockPublisher()
 			publisher.SetReturnStrings([][]string{{"one"}})
 			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
@@ -120,7 +119,7 @@ var _ = Describe("Compute historical state transformer", func() {
 			fakeBlock := &types.Block{}
 			db.SetGetBlockByBlockNumberReturnBlock(fakeBlock)
 			decoder := test_helpers.NewMockDecoder()
-			decoder.SetReturnOut(&types.Header{Root: common.HexToHash("0x123")})
+			decoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
 			publisher := test_helpers.NewMockPublisher()
 			publisher.SetReturnStrings([][]string{{"one"}})
 			transformer := transformers.NewComputeEthStateTrieTransformer(db, decoder, publisher)
