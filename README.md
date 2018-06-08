@@ -1,6 +1,6 @@
-# Block Watcher
+# Eth Block Extractor
 
-[![Build Status](https://travis-ci.org/vulcanize/block_watcher.svg?branch=master)](https://travis-ci.org/vulcanize/block_watcher)
+[![Build Status](https://travis-ci.org/vulcanize/eth-block-extractor.svg?branch=master)](https://travis-ci.org/vulcanize/eth-block-extractor)
 
 ## Description
 A [VulcanizeDB](https://github.com/vulcanize/VulcanizeDB) transformer for creating IPLDs for Ethereum block data.
@@ -16,9 +16,9 @@ A [VulcanizeDB](https://github.com/vulcanize/VulcanizeDB) transformer for creati
 ## Installation
 1. Setup Postgres and an Ethereum node - see [VulcanizeDB README](https://github.com/vulcanize/VulcanizeDB/blob/master/README.md).
 1. Sync VulcanizeDB to populate core block data (commands will read block data from VulcanizeDB to fetch and persist block RLP data).
-1. `git clone git@github.com:vulcanize/block_watcher.git`
+1. `git clone git@github.com:vulcanize/eth-block-extractor.git`
 
-  _note: `go get` does not work for this project because need to run the (fixlibcrypto)[https://github.com/vulcanize/block_watcher/blob/master/Makefile] command along with `go build`._
+  _note: `go get` does not work for this project because need to run the (fixlibcrypto)[https://github.com/vulcanize/eth-block-extractor/blob/master/Makefile] command along with `go build`._
 1. Build:
     ```
     make build
@@ -36,27 +36,27 @@ A [VulcanizeDB](https://github.com/vulcanize/VulcanizeDB) transformer for creati
 
 ## Running the createIpldForBlockHeader command
 - This command creates an IPLD for the header of a single Ethereum block.
-- `./block_watcher createIpldForBlockHeader --config <config.toml> --block-number <block-number>`
+- `./eth-block-extractor createIpldForBlockHeader --config <config.toml> --block-number <block-number>`
 - Note: block number argument is required.
 
 ## Running the createIpldForBlockHeaders command
 - This command creates IPLDs for headers in a range of Ethereum blocks.
-- `./block_watcher createIpldForBlockHeaders --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
+- `./eth-block-extractor createIpldForBlockHeaders --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
 - Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number.
 
 ## Running the createIpldsForBlockTransactions command
 - This command creates IPLDs for transactions on an Ethereum block.
-- `./block_watcher createIpldsForBlockTransactions --config <config.toml> --block-number <block-number>`
+- `./eth-block-extractor createIpldsForBlockTransactions --config <config.toml> --block-number <block-number>`
 - Note: block number argument is required.
 
 ## Running the createIpldsForBlocksTransactions command
 - This command creates IPLDs for transactions on a range of Ethereum blocks.
-- `./block_watcher createIpldsForBlocksTransactions --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
+- `./eth-block-extractor createIpldsForBlocksTransactions --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
 - Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number.
 
 ## Running the createIpldsForStateTrie command
 - This command creates IPLDs for state trie nodes in a range of Ethereum blocks.
-- `./block_watcher createIpldsForStateTrie --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
+- `./eth-block-extractor createIpldsForStateTrie --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
 - Note: requires running an archive node. LevelDB lookup for state trie will fail otherwise due to state pruning.
 
 ## Running the tests

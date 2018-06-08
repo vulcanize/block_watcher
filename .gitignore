@@ -2,4 +2,5 @@
 .idea
 blocks/*
 block_watcher
+eth-block-extractor
 environments/*.toml

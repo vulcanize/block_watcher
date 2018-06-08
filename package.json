@@ -1,10 +1,10 @@
 {
   "author": "robertmulholand",
   "bugs": {
-    "url": "github.com/vulcanize/block_watcher"
+    "url": "github.com/vulcanize/eth-block-extractor"
   },
   "gx": {
-    "dvcsimport": "github.com/vulcanize/block_watcher"
+    "dvcsimport": "github.com/vulcanize/eth-block-extractor"
   },
   "gxDependencies": [
     {
@@ -29,7 +29,7 @@
   "gxVersion": "0.12.1",
   "language": "Go",
   "license": "",
-  "name": "block_watcher",
+  "name": "eth-block-extractor",
   "releaseCmd": "git commit -a -m \"gx publish $VERSION\"",
   "version": "0.0.0"
 }
