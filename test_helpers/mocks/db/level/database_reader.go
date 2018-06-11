@@ -8,31 +8,36 @@ import (
 )
 
 type MockLevelDatabaseReader struct {
-	getBlockPassedHash           common.Hash
-	getBlockPassedNumber         uint64
-	getBlockReturnBlock          *types.Block
-	getBodyRLPPassedHash         common.Hash
-	getBodyRLPPassedNumber       uint64
-	getCanonicalHashPassedNumber uint64
-	getCanonicalHashReturnHash   common.Hash
-	getHeaderRLPPassedHash       common.Hash
-	getHeaderRLPPassedNumber     uint64
-	getStateTrieNodesPassedRoot  common.Hash
-	getStateTrieNodesReturnErr   error
-	getStateTrieNodesReturnBytes [][]byte
+	getBlockPassedHash                                common.Hash
+	getBlockPassedNumber                              uint64
+	getBlockReturnBlock                               *types.Block
+	getBodyRLPPassedHash                              common.Hash
+	getBodyRLPPassedNumber                            uint64
+	getCanonicalHashPassedNumber                      uint64
+	getCanonicalHashReturnHash                        common.Hash
+	getHeaderRLPPassedHash                            common.Hash
+	getHeaderRLPPassedNumber                          uint64
+	getStateAndStorageTrieNodesPassedRoot             common.Hash
+	getStateAndStorageTrieNodesReturnErr              error
+	getStateAndStorageTrieNodesReturnStateTrieBytes   [][]byte
+	getStateAndStorageTrieNodesReturnStorageTrieBytes [][]byte
 }
 
 func NewMockLevelDatabaseReader() *MockLevelDatabaseReader {
 	return &MockLevelDatabaseReader{
-		getBodyRLPPassedHash:         common.Hash{},
-		getBodyRLPPassedNumber:       0,
-		getCanonicalHashPassedNumber: 0,
-		getCanonicalHashReturnHash:   common.Hash{},
-		getHeaderRLPPassedHash:       common.Hash{},
-		getHeaderRLPPassedNumber:     0,
-		getStateTrieNodesPassedRoot:  common.Hash{},
-		getStateTrieNodesReturnErr:   nil,
-		getStateTrieNodesReturnBytes: nil,
+		getBlockPassedHash:                                common.Hash{},
+		getBlockPassedNumber:                              0,
+		getBlockReturnBlock:                               nil,
+		getBodyRLPPassedHash:                              common.Hash{},
+		getBodyRLPPassedNumber:                            0,
+		getCanonicalHashPassedNumber:                      0,
+		getCanonicalHashReturnHash:                        common.Hash{},
+		getHeaderRLPPassedHash:                            common.Hash{},
+		getHeaderRLPPassedNumber:                          0,
+		getStateAndStorageTrieNodesPassedRoot:             common.Hash{},
+		getStateAndStorageTrieNodesReturnErr:              nil,
+		getStateAndStorageTrieNodesReturnStateTrieBytes:   nil,
+		getStateAndStorageTrieNodesReturnStorageTrieBytes: nil,
 	}
 }
 
@@ -44,12 +49,16 @@ func (mldr *MockLevelDatabaseReader) SetGetCanonicalHashReturnHash(hash common.H
 	mldr.getCanonicalHashReturnHash = hash
 }
 
-func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnBytes(returnBytes [][]byte) {
-	mldr.getStateTrieNodesReturnBytes = returnBytes
+func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnStateTrieBytes(returnBytes [][]byte) {
+	mldr.getStateAndStorageTrieNodesReturnStateTrieBytes = returnBytes
+}
+
+func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnStorageTrieBytes(returnBytes [][]byte) {
+	mldr.getStateAndStorageTrieNodesReturnStorageTrieBytes = returnBytes
 }
 
 func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnErr(err error) {
-	mldr.getStateTrieNodesReturnErr = err
+	mldr.getStateAndStorageTrieNodesReturnErr = err
 }
 
 func (mldr *MockLevelDatabaseReader) GetBlock(hash common.Hash, number uint64) *types.Block {
@@ -75,9 +84,9 @@ func (mldr *MockLevelDatabaseReader) GetHeaderRLP(hash common.Hash, number uint6
 	return nil
 }
 
-func (mldr *MockLevelDatabaseReader) GetStateTrieNodes(root common.Hash) ([][]byte, error) {
-	mldr.getStateTrieNodesPassedRoot = root
-	return mldr.getStateTrieNodesReturnBytes, mldr.getStateTrieNodesReturnErr
+func (mldr *MockLevelDatabaseReader) GetStateAndStorageTrieNodes(root common.Hash) ([][]byte, [][]byte, error) {
+	mldr.getStateAndStorageTrieNodesPassedRoot = root
+	return mldr.getStateAndStorageTrieNodesReturnStateTrieBytes, mldr.getStateAndStorageTrieNodesReturnStorageTrieBytes, mldr.getStateAndStorageTrieNodesReturnErr
 }
 
 func (mldr *MockLevelDatabaseReader) AssertGetBlockCalledWith(hash common.Hash, number uint64) {
@@ -100,5 +109,5 @@ func (mldr *MockLevelDatabaseReader) AssertGetHeaderRLPCalledWith(hash common.Ha
 }
 
 func (mldr *MockLevelDatabaseReader) AssertGetStateTrieNodesCalledWith(root common.Hash) {
-	Expect(mldr.getStateTrieNodesPassedRoot).To(Equal(root))
+	Expect(mldr.getStateAndStorageTrieNodesPassedRoot).To(Equal(root))
 }

@@ -7,13 +7,13 @@ import (
 
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_block_header"
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
-	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/db"
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/rlp"
 )
 
 var _ = Describe("Creating an IPLD for a block header", func() {
 	It("decodes passed bytes into ethereum block header", func() {
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(ipfs.NewMockAdder(), mockDecoder)
 		fakeBytes := []byte{1, 2, 3, 4, 5}
@@ -25,7 +25,8 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 	})
 
 	It("returns error if decoding fails", func() {
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
+		mockDecoder.SetReturnOut(&types.Header{})
 		mockDecoder.SetError(test_helpers.FakeError)
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(ipfs.NewMockAdder(), mockDecoder)
 
@@ -37,7 +38,7 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 
 	It("adds ethereum block header to ipfs", func() {
 		mockAdder := ipfs.NewMockAdder()
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, mockDecoder)
 		fakeBytes := []byte{1, 2, 3, 4, 5}
@@ -51,7 +52,7 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 	It("returns error if adding to ipfs fails", func() {
 		mockAdder := ipfs.NewMockAdder()
 		mockAdder.SetError(test_helpers.FakeError)
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, mockDecoder)
 

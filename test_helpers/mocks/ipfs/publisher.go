@@ -1,6 +1,9 @@
 package ipfs
 
-import . "github.com/onsi/gomega"
+import (
+	. "github.com/onsi/gomega"
+	"github.com/vulcanize/eth-block-extractor/test_helpers"
+)
 
 type MockPublisher struct {
 	err              error
@@ -29,11 +32,25 @@ func (mp *MockPublisher) Write(blockData []byte) ([]string, error) {
 	if mp.err != nil {
 		return nil, mp.err
 	}
-	bytesToReturn := mp.returnStrings[0]
-	mp.returnStrings = mp.returnStrings[1:]
-	return bytesToReturn, nil
+	var stringsToReturn []string
+	if len(mp.returnStrings) > 0 {
+		stringsToReturn = mp.returnStrings[0]
+		if len(mp.returnStrings) > 1 {
+			mp.returnStrings = mp.returnStrings[1:]
+		} else {
+			mp.returnStrings = [][]string{{test_helpers.FakeString}}
+		}
+	} else {
+		stringsToReturn = []string{test_helpers.FakeString}
+	}
+	return stringsToReturn, nil
 }
 
 func (mp *MockPublisher) AssertWriteCalledWith(blockDatas [][]byte) {
-	Expect(mp.passedBlockDatas).To(Equal(blockDatas))
+	for i := 0; i < len(blockDatas); i++ {
+		Expect(mp.passedBlockDatas).To(ContainElement(blockDatas[i]))
+	}
+	for i := 0; i < len(mp.passedBlockDatas); i++ {
+		Expect(blockDatas).To(ContainElement(mp.passedBlockDatas[i]))
+	}
 }

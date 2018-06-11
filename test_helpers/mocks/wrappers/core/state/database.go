@@ -12,7 +12,7 @@ import (
 
 type MockStateDatabase struct {
 	returnDB state.Database
-	trie     state_wrapper.GethStateTrie
+	trie     state_wrapper.GethTrie
 }
 
 func NewMockStateDatabase() *MockStateDatabase {
@@ -30,7 +30,7 @@ func (msdb *MockStateDatabase) SetReturnDatabase(db state.Database) {
 	msdb.returnDB = db
 }
 
-func (msdb *MockStateDatabase) SetReturnTrie(trie state_wrapper.GethStateTrie) {
+func (msdb *MockStateDatabase) SetReturnTrie(trie state_wrapper.GethTrie) {
 	msdb.trie = trie
 }
 
@@ -38,7 +38,7 @@ func (msdb *MockStateDatabase) Database() state.Database {
 	return msdb.returnDB
 }
 
-func (msdb *MockStateDatabase) OpenTrie(root common.Hash) (state_wrapper.GethStateTrie, error) {
+func (msdb *MockStateDatabase) OpenTrie(root common.Hash) (state_wrapper.GethTrie, error) {
 	return msdb.trie, nil
 }
 
@@ -72,7 +72,7 @@ func (*mockStateDatabase) OpenTrie(root common.Hash) (state.Trie, error) {
 
 func (*mockStateDatabase) TrieDB() *trie.Database {
 	trieDB := trie.NewDatabase(&mockEthDB{})
-	trieDB.Insert(test_helpers.FakeHash, []byte{1, 2, 3, 4, 5})
+	trieDB.Insert(test_helpers.FakeHash, test_helpers.FakeTrieNode)
 	return trieDB
 }
 
@@ -85,7 +85,7 @@ func (mockEthDB) Put(key []byte, value []byte) error {
 }
 
 func (mockEthDB) Get(key []byte) ([]byte, error) {
-	panic("implement me")
+	return []byte{1, 2, 3, 4, 5}, nil
 }
 
 func (mockEthDB) Has(key []byte) (bool, error) {

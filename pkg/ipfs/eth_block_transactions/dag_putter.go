@@ -5,9 +5,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/types"
 
-	"github.com/vulcanize/eth-block-extractor/pkg/db"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/util"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 )
 
 const (
@@ -16,21 +16,20 @@ const (
 
 type BlockTransactionsDagPutter struct {
 	adder   ipfs.Adder
-	decoder db.Decoder
+	decoder rlp.Decoder
 }
 
-func NewBlockTransactionsDagPutter(adder ipfs.Adder, decoder db.Decoder) *BlockTransactionsDagPutter {
+func NewBlockTransactionsDagPutter(adder ipfs.Adder, decoder rlp.Decoder) *BlockTransactionsDagPutter {
 	return &BlockTransactionsDagPutter{adder: adder, decoder: decoder}
 }
 
 func (bbdp *BlockTransactionsDagPutter) DagPut(raw []byte) ([]string, error) {
 	var blockBody types.Body
-	out, err := bbdp.decoder.Decode(raw, &blockBody)
+	err := bbdp.decoder.Decode(raw, &blockBody)
 	if err != nil {
 		return nil, err
 	}
-	body := out.(*types.Body)
-	transactions := body.Transactions
+	transactions := blockBody.Transactions
 	var cids []string
 	for _, transaction := range transactions {
 		buffer := new(bytes.Buffer)

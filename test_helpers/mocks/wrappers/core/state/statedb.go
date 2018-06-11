@@ -4,6 +4,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/state"
 	. "github.com/onsi/gomega"
+	"github.com/vulcanize/eth-block-extractor/test_helpers"
 )
 
 type MockStateDB struct {
@@ -30,7 +31,7 @@ func (mst *MockStateDB) SetStateDB(db *state.StateDB) {
 
 func (mst *MockStateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
 	mst.commitCalled = true
-	return common.Hash{}, mst.returnErr
+	return test_helpers.FakeHash, mst.returnErr
 }
 
 func (mst *MockStateDB) StateDB() *state.StateDB {

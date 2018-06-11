@@ -127,7 +127,7 @@ var _ = Describe("", func() {
 		Expect(err).To(MatchError(test_helpers.FakeError))
 	})
 
-	It("returns nodes from memory database", func() {
+	It("returns computed state trie root", func() {
 		chain, db, processor, trieFactory, validator := getMocks()
 		computer := level.NewStateComputer(chain, db, processor, trieFactory, validator)
 		fakeIterator := trie.NewMockIterator(2)
@@ -137,11 +137,10 @@ var _ = Describe("", func() {
 		db.SetReturnTrie(fakeTrie)
 		currentBlock, parentBlock := getFakeBlocks()
 
-		results, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
+		stateRoot, err := computer.ComputeBlockStateTrie(currentBlock, parentBlock)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(len(results)).To(Equal(2))
-		Expect(results[0]).To(Equal([]byte{1, 2, 3, 4, 5}))
+		Expect(stateRoot).To(Equal(test_helpers.FakeHash))
 	})
 })
 

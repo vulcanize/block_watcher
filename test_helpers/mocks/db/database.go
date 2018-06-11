@@ -1,50 +1,53 @@
 package db
 
 import (
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	. "github.com/onsi/gomega"
 )
 
 type MockDatabase struct {
-	computeBlockStateTrieErr                      error
-	computeBlockStateTriePassedCurrentBlock       *types.Block
-	computeBlockStateTriePassedParentBlock        *types.Block
-	computeBlockStateTrieReturnBytes              [][]byte
-	getBlockBodyByBlockNumberErr                  error
-	getBlockBodyByBlockNumberPassedBlockNumbers   []int64
-	getBlockBodyByBlockNumberReturnBytes          [][]byte
-	getBlockByBlockNumberPassedNumbers            []int64
-	getBlockByBlockNumberReturnBlock              *types.Block
-	getBlockHeaderByBlockNumberErr                error
-	getBlockHeaderByBlockNumberPassedBlockNumbers []int64
-	getBlockHeaderByBlockNumberReturnBytes        [][]byte
-	getStateTrieNodesErr                          error
-	getStateTrieNodesPassedRoot                   []byte
-	getStateTrieNodesReturnBytes                  [][]byte
+	computeBlockStateTrieErr                          error
+	computeBlockStateTriePassedCurrentBlock           *types.Block
+	computeBlockStateTriePassedParentBlock            *types.Block
+	computeBlockStateTrieReturnHash                   common.Hash
+	getBlockBodyByBlockNumberErr                      error
+	getBlockBodyByBlockNumberPassedBlockNumbers       []int64
+	getBlockBodyByBlockNumberReturnBytes              [][]byte
+	getBlockByBlockNumberPassedNumbers                []int64
+	getBlockByBlockNumberReturnBlock                  *types.Block
+	getBlockHeaderByBlockNumberErr                    error
+	getBlockHeaderByBlockNumberPassedBlockNumbers     []int64
+	getBlockHeaderByBlockNumberReturnBytes            [][]byte
+	getStateAndStorageTrieNodesErr                    error
+	getStateAndStorageTrieNodesPassedRoot             common.Hash
+	getStateAndStorageTrieNodesReturnStateTrieBytes   [][]byte
+	getStateAndStorageTrieNodesReturnStorageTrieBytes [][]byte
 }
 
 func NewMockDatabase() *MockDatabase {
 	return &MockDatabase{
-		computeBlockStateTrieErr:                      nil,
-		computeBlockStateTriePassedCurrentBlock:       nil,
-		computeBlockStateTriePassedParentBlock:        nil,
-		computeBlockStateTrieReturnBytes:              nil,
-		getBlockBodyByBlockNumberErr:                  nil,
-		getBlockBodyByBlockNumberPassedBlockNumbers:   nil,
-		getBlockBodyByBlockNumberReturnBytes:          nil,
-		getBlockByBlockNumberPassedNumbers:            nil,
-		getBlockByBlockNumberReturnBlock:              nil,
-		getBlockHeaderByBlockNumberErr:                nil,
-		getBlockHeaderByBlockNumberPassedBlockNumbers: nil,
-		getBlockHeaderByBlockNumberReturnBytes:        nil,
-		getStateTrieNodesErr:                          nil,
-		getStateTrieNodesPassedRoot:                   nil,
-		getStateTrieNodesReturnBytes:                  nil,
+		computeBlockStateTrieErr:                          nil,
+		computeBlockStateTriePassedCurrentBlock:           nil,
+		computeBlockStateTriePassedParentBlock:            nil,
+		computeBlockStateTrieReturnHash:                   common.Hash{},
+		getBlockBodyByBlockNumberErr:                      nil,
+		getBlockBodyByBlockNumberPassedBlockNumbers:       nil,
+		getBlockBodyByBlockNumberReturnBytes:              nil,
+		getBlockByBlockNumberPassedNumbers:                nil,
+		getBlockByBlockNumberReturnBlock:                  nil,
+		getBlockHeaderByBlockNumberErr:                    nil,
+		getBlockHeaderByBlockNumberPassedBlockNumbers:     nil,
+		getBlockHeaderByBlockNumberReturnBytes:            nil,
+		getStateAndStorageTrieNodesErr:                    nil,
+		getStateAndStorageTrieNodesPassedRoot:             common.Hash{},
+		getStateAndStorageTrieNodesReturnStateTrieBytes:   nil,
+		getStateAndStorageTrieNodesReturnStorageTrieBytes: nil,
 	}
 }
 
-func (md *MockDatabase) SetComputeBlockStateTrieReturnBytes(returnBytes [][]byte) {
-	md.computeBlockStateTrieReturnBytes = returnBytes
+func (md *MockDatabase) SetComputeBlockStateTrieReturnHash(hash common.Hash) {
+	md.computeBlockStateTrieReturnHash = hash
 }
 
 func (md *MockDatabase) SetGetBlockBodyByBlockNumberReturnBytes(returnBytes [][]byte) {
@@ -59,8 +62,12 @@ func (md *MockDatabase) SetGetBlockHeaderByBlockNumberReturnBytes(returnBytes []
 	md.getBlockHeaderByBlockNumberReturnBytes = returnBytes
 }
 
-func (md *MockDatabase) SetGetStateTrieNodesReturnBytes(returnBytes [][]byte) {
-	md.getStateTrieNodesReturnBytes = returnBytes
+func (md *MockDatabase) SetGetStateAndStorageTrieNodesReturnStateTrieBytes(returnBytes [][]byte) {
+	md.getStateAndStorageTrieNodesReturnStateTrieBytes = returnBytes
+}
+
+func (md *MockDatabase) SetGetStateAndStorageTrieNodesReturnStorageTrieBytes(returnBytes [][]byte) {
+	md.getStateAndStorageTrieNodesReturnStorageTrieBytes = returnBytes
 }
 
 func (md *MockDatabase) SetComputeBlockStateTrieError(err error) {
@@ -76,13 +83,13 @@ func (md *MockDatabase) SetGetBlockHeaderByBlockNumberError(err error) {
 }
 
 func (md *MockDatabase) SetGetStateTrieNodesError(err error) {
-	md.getStateTrieNodesErr = err
+	md.getStateAndStorageTrieNodesErr = err
 }
 
-func (md *MockDatabase) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) ([][]byte, error) {
+func (md *MockDatabase) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error) {
 	md.computeBlockStateTriePassedCurrentBlock = currentBlock
 	md.computeBlockStateTriePassedParentBlock = parentBlock
-	return md.computeBlockStateTrieReturnBytes, md.computeBlockStateTrieErr
+	return md.computeBlockStateTrieReturnHash, md.computeBlockStateTrieErr
 }
 
 func (md *MockDatabase) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
@@ -110,9 +117,9 @@ func (md *MockDatabase) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, 
 	return returnBytes, nil
 }
 
-func (md *MockDatabase) GetStateTrieNodes(root []byte) ([][]byte, error) {
-	md.getStateTrieNodesPassedRoot = root
-	return md.getStateTrieNodesReturnBytes, md.getStateTrieNodesErr
+func (md *MockDatabase) GetStateAndStorageTrieNodes(root common.Hash) ([][]byte, [][]byte, error) {
+	md.getStateAndStorageTrieNodesPassedRoot = root
+	return md.getStateAndStorageTrieNodesReturnStateTrieBytes, md.getStateAndStorageTrieNodesReturnStorageTrieBytes, md.getStateAndStorageTrieNodesErr
 }
 
 func (md *MockDatabase) AssertComputeBlockStateTrieCalledWith(currentBlock *types.Block, parentBlock *types.Block) {
@@ -137,6 +144,6 @@ func (md *MockDatabase) AssertGetBlockHeaderByBlockNumberCalledWith(blockNumbers
 	Expect(md.getBlockHeaderByBlockNumberPassedBlockNumbers).To(Equal(blockNumbers))
 }
 
-func (md *MockDatabase) AssertGetStateTrieNodesCalledWith(root []byte) {
-	Expect(md.getStateTrieNodesPassedRoot).To(Equal(root))
+func (md *MockDatabase) AssertGetStateTrieNodesCalledWith(root common.Hash) {
+	Expect(md.getStateAndStorageTrieNodesPassedRoot).To(Equal(root))
 }

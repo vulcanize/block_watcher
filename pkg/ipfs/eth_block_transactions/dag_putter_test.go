@@ -7,14 +7,14 @@ import (
 
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_block_transactions"
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
-	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/db"
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/rlp"
 )
 
 var _ = Describe("Eth block transactions dag putter", func() {
 	It("decodes passed raw data into an ethereum block body", func() {
 		mockAdder := ipfs.NewMockAdder()
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Body{})
 		dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(mockAdder, mockDecoder)
 		fakeBytes := []byte{1, 2, 3, 4, 5}
@@ -27,7 +27,8 @@ var _ = Describe("Eth block transactions dag putter", func() {
 
 	It("returns error if decoding fails", func() {
 		mockAdder := ipfs.NewMockAdder()
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
+		mockDecoder.SetReturnOut(&types.Body{})
 		mockDecoder.SetError(test_helpers.FakeError)
 		dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(mockAdder, mockDecoder)
 
@@ -39,7 +40,7 @@ var _ = Describe("Eth block transactions dag putter", func() {
 
 	It("adds a node for each transaction on the block", func() {
 		mockAdder := ipfs.NewMockAdder()
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		fakeTransactionOne := &types.Transaction{}
 		fakeTransactionTwo := &types.Transaction{}
 		fakeBlockBody := &types.Body{
@@ -58,7 +59,7 @@ var _ = Describe("Eth block transactions dag putter", func() {
 	It("returns error if adding node fails", func() {
 		mockAdder := ipfs.NewMockAdder()
 		mockAdder.SetError(test_helpers.FakeError)
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Body{Transactions: types.Transactions{&types.Transaction{}}})
 		dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(mockAdder, mockDecoder)
 

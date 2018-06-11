@@ -13,6 +13,7 @@ import (
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/db"
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/rlp"
 )
 
 var _ = Describe("Ethereum state trie transformer", func() {
@@ -23,9 +24,9 @@ var _ = Describe("Ethereum state trie transformer", func() {
 	It("fetches block header for block", func() {
 		mockDB := db.NewMockDatabase()
 		mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
-		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, ipfs.NewMockPublisher())
+		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, ipfs.NewMockPublisher(), ipfs.NewMockPublisher())
 
 		err := transformer.Execute(0, 0)
 
@@ -36,7 +37,7 @@ var _ = Describe("Ethereum state trie transformer", func() {
 	It("returns err if fetching block header returns err", func() {
 		mockDB := db.NewMockDatabase()
 		mockDB.SetGetBlockHeaderByBlockNumberError(test_helpers.FakeError)
-		transformer := transformers.NewEthStateTrieTransformer(mockDB, db.NewMockDecoder(), ipfs.NewMockPublisher())
+		transformer := transformers.NewEthStateTrieTransformer(mockDB, rlp.NewMockDecoder(), ipfs.NewMockPublisher(), ipfs.NewMockPublisher())
 
 		err := transformer.Execute(0, 0)
 
@@ -44,28 +45,28 @@ var _ = Describe("Ethereum state trie transformer", func() {
 		Expect(err.Error()).To(ContainSubstring(test_helpers.FakeError.Error()))
 	})
 
-	It("fetches state trie nodes with state root from decoded block header", func() {
+	It("fetches state and storage trie nodes with state root from decoded block header", func() {
 		mockDB := db.NewMockDatabase()
 		fakeHeader := []byte{6, 7, 8, 9, 0}
 		mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{fakeHeader})
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{Root: test_helpers.FakeHash})
-		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, ipfs.NewMockPublisher())
+		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, ipfs.NewMockPublisher(), ipfs.NewMockPublisher())
 
 		err := transformer.Execute(0, 0)
 
 		Expect(err).NotTo(HaveOccurred())
 		mockDecoder.AssertDecodeCalledWith(fakeHeader, &types.Header{})
-		mockDB.AssertGetStateTrieNodesCalledWith(test_helpers.FakeHash.Bytes())
+		mockDB.AssertGetStateTrieNodesCalledWith(test_helpers.FakeHash)
 	})
 
 	It("returns err if fetching state trie returns err", func() {
 		mockDB := db.NewMockDatabase()
 		mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 		mockDB.SetGetStateTrieNodesError(test_helpers.FakeError)
-		mockDecoder := db.NewMockDecoder()
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{Root: common.Hash{}})
-		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, ipfs.NewMockPublisher())
+		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, ipfs.NewMockPublisher(), ipfs.NewMockPublisher())
 
 		err := transformer.Execute(0, 0)
 
@@ -77,16 +78,33 @@ var _ = Describe("Ethereum state trie transformer", func() {
 		mockDB := db.NewMockDatabase()
 		mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
 		fakeStateTrieNodes := [][]byte{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 0}}
-		mockDB.SetGetStateTrieNodesReturnBytes(fakeStateTrieNodes)
-		mockDecoder := db.NewMockDecoder()
+		mockDB.SetGetStateAndStorageTrieNodesReturnStateTrieBytes(fakeStateTrieNodes)
+		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{})
-		mockPublisher := ipfs.NewMockPublisher()
-		mockPublisher.SetReturnStrings([][]string{{"one"}, {"two"}})
-		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, mockPublisher)
+		mockStateTriePublisher := ipfs.NewMockPublisher()
+		mockStateTriePublisher.SetReturnStrings([][]string{{"one"}, {"two"}})
+		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, mockStateTriePublisher, ipfs.NewMockPublisher())
 
 		err := transformer.Execute(0, 0)
 
 		Expect(err).NotTo(HaveOccurred())
-		mockPublisher.AssertWriteCalledWith(fakeStateTrieNodes)
+		mockStateTriePublisher.AssertWriteCalledWith(fakeStateTrieNodes)
+	})
+
+	It("writes storage trie nodes to ipfs", func() {
+		mockDB := db.NewMockDatabase()
+		mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
+		fakeStateTrieNodes := [][]byte{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 0}}
+		mockDB.SetGetStateAndStorageTrieNodesReturnStorageTrieBytes(fakeStateTrieNodes)
+		mockDecoder := rlp.NewMockDecoder()
+		mockDecoder.SetReturnOut(&types.Header{})
+		mockStorageTriePublisher := ipfs.NewMockPublisher()
+		mockStorageTriePublisher.SetReturnStrings([][]string{{"one"}, {"two"}})
+		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, ipfs.NewMockPublisher(), mockStorageTriePublisher)
+
+		err := transformer.Execute(0, 0)
+
+		Expect(err).NotTo(HaveOccurred())
+		mockStorageTriePublisher.AssertWriteCalledWith(fakeStateTrieNodes)
 	})
 })

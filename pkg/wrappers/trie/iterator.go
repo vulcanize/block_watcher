@@ -21,17 +21,17 @@ func NewNodeIterator(nodeIterator trie.NodeIterator) *NodeIterator {
 }
 
 func (ni *NodeIterator) Hash() common.Hash {
-	return ni.Hash()
+	return ni.iterator.Hash()
 }
 
 func (ni *NodeIterator) Leaf() bool {
-	return ni.Leaf()
+	return ni.iterator.Leaf()
 }
 
 func (ni *NodeIterator) LeafBlob() []byte {
-	return ni.LeafBlob()
+	return ni.iterator.LeafBlob()
 }
 
 func (ni *NodeIterator) Next(b bool) bool {
-	return ni.Next(b)
+	return ni.iterator.Next(b)
 }

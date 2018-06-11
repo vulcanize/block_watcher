@@ -5,7 +5,7 @@ import (
 	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/trie"
 )
 
-type GethStateTrie interface {
+type GethTrie interface {
 	NodeIterator(startKey []byte) trie.GethTrieNodeIterator
 }
 
@@ -13,7 +13,7 @@ type Trie struct {
 	trie state.Trie
 }
 
-func NewTrie(trie state.Trie) GethStateTrie {
+func NewTrie(trie state.Trie) GethTrie {
 	return &Trie{trie: trie}
 }
 

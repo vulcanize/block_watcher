@@ -4,11 +4,13 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/vulcanize/eth-block-extractor/pkg/db/level"
 	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core"
 	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 )
 
 var ErrNoSuchDb = errors.New("no such database")
@@ -23,11 +25,11 @@ func (re ReadError) Error() string {
 }
 
 type Database interface {
-	ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) ([][]byte, error)
+	ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error)
 	GetBlockByBlockNumber(blockNumber int64) *types.Block
 	GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error)
 	GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
-	GetStateTrieNodes(root []byte) ([][]byte, error)
+	GetStateAndStorageTrieNodes(root common.Hash) (stateTrieNodes, storageTrieNodes [][]byte, err error)
 }
 
 func CreateDatabase(config DatabaseConfig) (Database, error) {
@@ -37,27 +39,34 @@ func CreateDatabase(config DatabaseConfig) (Database, error) {
 		if err != nil {
 			return nil, ReadError{msg: "Failed to connect to LevelDB", err: err}
 		}
+		stateDatabase := state.NewDatabase(levelDBConnection)
+		stateTrieReader := createStateTrieReader(levelDBConnection, stateDatabase)
 		levelDBReader := level.NewLevelDatabaseReader(levelDBConnection)
-		stateComputer, err := createStateComputer(levelDBConnection)
+		stateComputer, err := createStateComputer(levelDBConnection, stateDatabase)
 		if err != nil {
 			return nil, err
 		}
-		levelDB := level.NewLevelDatabase(levelDBReader, stateComputer)
+		levelDB := level.NewLevelDatabase(levelDBReader, stateComputer, stateTrieReader)
 		return levelDB, nil
 	default:
 		return nil, ReadError{msg: "Unknown database not implemented", err: ErrNoSuchDb}
 	}
 }
 
-func createStateComputer(databaseConnection ethdb.Database) (level.IStateComputer, error) {
+func createStateTrieReader(databaseConnection ethdb.Database, stateDatabase state.GethStateDatabase) level.IStateTrieReader {
+	decoder := rlp.RlpDecoder{}
+	storageTrieReader := level.NewStorageTrieReader(stateDatabase, decoder)
+	return level.NewStateTrieReader(stateDatabase, storageTrieReader)
+}
+
+func createStateComputer(databaseConnection ethdb.Database, stateDatabase state.GethStateDatabase) (level.IStateComputer, error) {
 	blockChain, err := core.NewBlockChain(databaseConnection)
 	if err != nil {
 		return nil, err
 	}
-	db := state.NewDatabase(databaseConnection)
 	processor := core.NewStateProcessor(*blockChain)
 	trieFactory := state.NewStateDBFactory()
 	validator := core.NewBlockValidator(*blockChain)
-	computer := level.NewStateComputer(blockChain, db, processor, trieFactory, validator)
+	computer := level.NewStateComputer(blockChain, stateDatabase, processor, trieFactory, validator)
 	return computer, nil
 }

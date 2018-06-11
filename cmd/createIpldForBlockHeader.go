@@ -23,6 +23,7 @@ import (
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_block_header"
 	"github.com/vulcanize/eth-block-extractor/pkg/transformers"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 )
 
 // createIpldForBlockHeaderCmd represents the createIpldForBlockHeader command
@@ -58,7 +59,7 @@ func createIpldForBlockHeader() {
 	if err != nil {
 		log.Fatal("Error connecting to IPFS: ", err)
 	}
-	decoder := db.RlpDecoder{}
+	decoder := rlp.RlpDecoder{}
 	dagPutter := eth_block_header.NewBlockHeaderDagPutter(*ipfsNode, decoder)
 	publisher := ipfs.NewIpfsPublisher(dagPutter)
 

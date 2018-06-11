@@ -9,7 +9,7 @@ import (
 
 type GethStateDatabase interface {
 	Database() state.Database
-	OpenTrie(root common.Hash) (GethStateTrie, error)
+	OpenTrie(root common.Hash) (GethTrie, error)
 	TrieDB() trie.GethTrieDatabase
 }
 
@@ -28,7 +28,7 @@ func (db Database) Database() state.Database {
 	return db.db
 }
 
-func (db Database) OpenTrie(root common.Hash) (GethStateTrie, error) {
+func (db Database) OpenTrie(root common.Hash) (GethTrie, error) {
 	stateTrie, err := db.db.OpenTrie(root)
 	if err != nil {
 		return nil, err

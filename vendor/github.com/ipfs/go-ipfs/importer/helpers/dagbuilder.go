@@ -8,10 +8,10 @@ import (
 	dag "github.com/ipfs/go-ipfs/merkledag"
 	ft "github.com/ipfs/go-ipfs/unixfs"
 
-	chunker "gx/ipfs/QmWo8jYc19ppG7YoTsrr2kEtLRbARTJho5oNXFTR6B7Peq/go-ipfs-chunker"
-	cid "gx/ipfs/QmcZfnkapfECQGcLZaf9B79NRg7cRa9EnZh4LSbkCzwNvY/go-cid"
-	files "gx/ipfs/QmceUdzxkimdYsgtX733uNgzf1DLHyBKN6ehGSp85ayppM/go-ipfs-cmdkit/files"
-	ipld "gx/ipfs/Qme5bWv7wtjUNGsK2BNGVUFPKiuxWrsqrtvYwCLRw8YFES/go-ipld-format"
+	chunker "gx/ipfs/QmR4G4WBNGA5S5pvjFiTkuehstC9769sLAHei8vZernhYR/go-ipfs-chunker"
+	ipld "gx/ipfs/QmWi2BYBL5gJ3CiAiQchg6rn1A8iBsrWy51EYxvHVjFvLb/go-ipld-format"
+	cid "gx/ipfs/QmapdYm1b22Frv3k17fqrBYTFRxwiaVJkB299Mfn33edeB/go-cid"
+	files "gx/ipfs/QmdE4gMduCKCGAcczM2F5ioYDfdeKuPix138wrES1YSr7f/go-ipfs-cmdkit/files"
 )
 
 // DagBuilderHelper wraps together a bunch of objects needed to
@@ -122,6 +122,41 @@ func (db *DagBuilderHelper) NewUnixfsNode() *UnixfsNode {
 	return n
 }
 
+// NewLeaf creates a leaf node filled with data.  If rawLeaves is
+// defined than a raw leaf will be returned.  Otherwise, if data is
+// nil the type field will be TRaw (for backwards compatibility), if
+// data is defined (but possibly empty) the type field will be TRaw.
+func (db *DagBuilderHelper) NewLeaf(data []byte) (*UnixfsNode, error) {
+	if len(data) > BlockSizeLimit {
+		return nil, ErrSizeLimitExceeded
+	}
+
+	if db.rawLeaves {
+		if db.prefix == nil {
+			return &UnixfsNode{
+				rawnode: dag.NewRawNode(data),
+				raw:     true,
+			}, nil
+		}
+		rawnode, err := dag.NewRawNodeWPrefix(data, *db.prefix)
+		if err != nil {
+			return nil, err
+		}
+		return &UnixfsNode{
+			rawnode: rawnode,
+			raw:     true,
+		}, nil
+	}
+
+	if data == nil {
+		return db.NewUnixfsNode(), nil
+	}
+
+	blk := db.newUnixfsBlock()
+	blk.SetData(data)
+	return blk, nil
+}
+
 // newUnixfsBlock creates a new Unixfs node to represent a raw data block
 func (db *DagBuilderHelper) newUnixfsBlock() *UnixfsNode {
 	n := &UnixfsNode{
@@ -164,30 +199,7 @@ func (db *DagBuilderHelper) GetNextDataNode() (*UnixfsNode, error) {
 		return nil, nil
 	}
 
-	if len(data) > BlockSizeLimit {
-		return nil, ErrSizeLimitExceeded
-	}
-
-	if db.rawLeaves {
-		if db.prefix == nil {
-			return &UnixfsNode{
-				rawnode: dag.NewRawNode(data),
-				raw:     true,
-			}, nil
-		}
-		rawnode, err := dag.NewRawNodeWPrefix(data, *db.prefix)
-		if err != nil {
-			return nil, err
-		}
-		return &UnixfsNode{
-			rawnode: rawnode,
-			raw:     true,
-		}, nil
-	}
-
-	blk := db.newUnixfsBlock()
-	blk.SetData(data)
-	return blk, nil
+	return db.NewLeaf(data)
 }
 
 // SetPosInfo sets the offset information of a node using the fullpath and stat

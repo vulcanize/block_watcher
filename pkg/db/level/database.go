@@ -6,18 +6,20 @@ import (
 )
 
 type Database struct {
-	reader        Reader
-	stateComputer IStateComputer
+	reader          Reader
+	stateComputer   IStateComputer
+	stateTrieReader IStateTrieReader
 }
 
-func NewLevelDatabase(ldbReader Reader, stateComputer IStateComputer) *Database {
+func NewLevelDatabase(ldbReader Reader, stateComputer IStateComputer, stateTrieReader IStateTrieReader) *Database {
 	return &Database{
-		reader:        ldbReader,
-		stateComputer: stateComputer,
+		reader:          ldbReader,
+		stateComputer:   stateComputer,
+		stateTrieReader: stateTrieReader,
 	}
 }
 
-func (l Database) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) ([][]byte, error) {
+func (l Database) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error) {
 	return l.stateComputer.ComputeBlockStateTrie(currentBlock, parentBlock)
 }
 
@@ -39,7 +41,6 @@ func (l Database) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
 	return l.reader.GetHeaderRLP(h, n), nil
 }
 
-func (l Database) GetStateTrieNodes(root []byte) ([][]byte, error) {
-	h := common.BytesToHash(root)
-	return l.reader.GetStateTrieNodes(h)
+func (l Database) GetStateAndStorageTrieNodes(root common.Hash) (stateTrieNodes, storageTrieNodes [][]byte, err error) {
+	return l.stateTrieReader.GetStateAndStorageTrieNodes(root)
 }

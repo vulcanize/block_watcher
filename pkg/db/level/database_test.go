@@ -15,7 +15,8 @@ var _ = Describe("Database", func() {
 	Describe("Computing state trie nodes", func() {
 		It("invokes state computer to build historical state", func() {
 			mockStateComputer := level_wrapper.NewMockStateComputer()
-			db := level.NewLevelDatabase(level_wrapper.NewMockLevelDatabaseReader(), mockStateComputer)
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(level_wrapper.NewMockLevelDatabaseReader(), mockStateComputer, mockStateTrieReader)
 			currentBlock := &types.Block{}
 			parentBlock := &types.Block{}
 
@@ -28,7 +29,8 @@ var _ = Describe("Database", func() {
 		It("returns err if state computer returns err", func() {
 			mockStateComputer := level_wrapper.NewMockStateComputer()
 			mockStateComputer.SetComputeBlockStateTrieReturnErr(test_helpers.FakeError)
-			db := level.NewLevelDatabase(level_wrapper.NewMockLevelDatabaseReader(), mockStateComputer)
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(level_wrapper.NewMockLevelDatabaseReader(), mockStateComputer, mockStateTrieReader)
 
 			_, err := db.ComputeBlockStateTrie(&types.Block{}, &types.Block{})
 
@@ -40,7 +42,8 @@ var _ = Describe("Database", func() {
 	Describe("Getting block body data", func() {
 		It("invokes the level database reader to query for block hash by block number", func() {
 			mockLevelDBReader := level_wrapper.NewMockLevelDatabaseReader()
-			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer())
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer(), mockStateTrieReader)
 			num := int64(123456)
 
 			_, err := db.GetBlockBodyByBlockNumber(num)
@@ -53,7 +56,8 @@ var _ = Describe("Database", func() {
 			mockLevelDBReader := level_wrapper.NewMockLevelDatabaseReader()
 			hash := common.HexToHash("abcde")
 			mockLevelDBReader.SetGetCanonicalHashReturnHash(hash)
-			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer())
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer(), mockStateTrieReader)
 			num := int64(123456)
 
 			_, err := db.GetBlockBodyByBlockNumber(num)
@@ -66,7 +70,8 @@ var _ = Describe("Database", func() {
 	Describe("Getting block", func() {
 		It("invokes the level database reader to query for block hash by block number", func() {
 			mockLevelDBReader := level_wrapper.NewMockLevelDatabaseReader()
-			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer())
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer(), mockStateTrieReader)
 			num := int64(123456)
 
 			db.GetBlockByBlockNumber(num)
@@ -78,7 +83,8 @@ var _ = Describe("Database", func() {
 			mockLevelDBReader := level_wrapper.NewMockLevelDatabaseReader()
 			hash := common.HexToHash("abcde")
 			mockLevelDBReader.SetGetCanonicalHashReturnHash(hash)
-			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer())
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer(), mockStateTrieReader)
 			num := int64(123456)
 
 			db.GetBlockByBlockNumber(num)
@@ -90,7 +96,8 @@ var _ = Describe("Database", func() {
 	Describe("Getting block header data", func() {
 		It("invokes the level database reader to query for block hash by block number", func() {
 			mockLevelDBReader := level_wrapper.NewMockLevelDatabaseReader()
-			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer())
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer(), mockStateTrieReader)
 			num := int64(123456)
 
 			_, err := db.GetBlockHeaderByBlockNumber(num)
@@ -103,7 +110,8 @@ var _ = Describe("Database", func() {
 			mockLevelDBReader := level_wrapper.NewMockLevelDatabaseReader()
 			hash := common.HexToHash("abcde")
 			mockLevelDBReader.SetGetCanonicalHashReturnHash(hash)
-			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer())
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer(), mockStateTrieReader)
 			num := int64(123456)
 
 			_, err := db.GetBlockHeaderByBlockNumber(num)
@@ -116,13 +124,14 @@ var _ = Describe("Database", func() {
 	Describe("Getting state trie nodes", func() {
 		It("invokes the level database reader to query for state trie data", func() {
 			mockLevelDBReader := level_wrapper.NewMockLevelDatabaseReader()
-			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer())
+			mockStateTrieReader := level_wrapper.NewMockStateTrieReader()
+			db := level.NewLevelDatabase(mockLevelDBReader, level_wrapper.NewMockStateComputer(), mockStateTrieReader)
 			root := common.HexToHash("abcde")
 
-			_, err := db.GetStateTrieNodes(root.Bytes())
+			_, _, err := db.GetStateAndStorageTrieNodes(root)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockLevelDBReader.AssertGetStateTrieNodesCalledWith(root)
+			mockStateTrieReader.AssertGetStateAndStorageTrieNodesCalledWith(root)
 		})
 	})
 })

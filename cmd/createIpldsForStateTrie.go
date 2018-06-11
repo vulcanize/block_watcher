@@ -22,7 +22,9 @@ import (
 	"github.com/vulcanize/eth-block-extractor/pkg/db"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_state_trie"
+	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_storage_trie"
 	"github.com/vulcanize/eth-block-extractor/pkg/transformers"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 )
 
 // createIpldsForStateTrieCmd represents the createIpldsForStateTrie command
@@ -64,22 +66,24 @@ func createIpldsForStateTrie() {
 	}
 
 	// init decoder
-	decoder := db.RlpDecoder{}
+	decoder := rlp.RlpDecoder{}
 
-	// init ipfs publisher
+	// init ipfs publishers
 	adder, err := ipfs.InitIPFSNode(ipfsPath)
 	if err != nil {
 		log.Fatal("Error connecting to ipfs: ", err)
 	}
-	dagPutter := eth_state_trie.NewStateTrieDagPutter(adder)
-	publisher := ipfs.NewIpfsPublisher(dagPutter)
+	stateTrieDagPutter := eth_state_trie.NewStateTrieDagPutter(adder)
+	stateTriePublisher := ipfs.NewIpfsPublisher(stateTrieDagPutter)
+	storageTrieDagPutter := eth_storage_trie.NewStorageTrieDagPutter(adder)
+	storageTriePublisher := ipfs.NewIpfsPublisher(storageTrieDagPutter)
 
 	// init and execute transformer
 	if computeState {
-		transformer := transformers.NewComputeEthStateTrieTransformer(database, decoder, publisher)
+		transformer := transformers.NewComputeEthStateTrieTransformer(database, decoder, stateTriePublisher, storageTriePublisher)
 		err = transformer.Execute(endingBlockNumber)
 	} else {
-		transformer := transformers.NewEthStateTrieTransformer(database, decoder, publisher)
+		transformer := transformers.NewEthStateTrieTransformer(database, decoder, stateTriePublisher, storageTriePublisher)
 		err = transformer.Execute(startingBlockNumber, endingBlockNumber)
 	}
 	if err != nil {
