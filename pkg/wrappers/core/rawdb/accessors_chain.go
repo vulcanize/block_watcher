@@ -1,4 +1,4 @@
-package level
+package rawdb
 
 import (
 	"github.com/ethereum/go-ethereum/common"
@@ -8,34 +8,33 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-// Wraps go-ethereum db operations
-type Reader interface {
+type IAccessorsChain interface {
 	GetBlock(hash common.Hash, number uint64) *types.Block
 	GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue
 	GetCanonicalHash(number uint64) common.Hash
 	GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue
 }
 
-type LDBReader struct {
+type AccessorsChain struct {
 	ethDbConnection ethdb.Database
 }
 
-func NewLevelDatabaseReader(databaseConnection ethdb.Database) *LDBReader {
-	return &LDBReader{ethDbConnection: databaseConnection}
+func NewAccessorsChain(databaseConnection ethdb.Database) *AccessorsChain {
+	return &AccessorsChain{ethDbConnection: databaseConnection}
 }
 
-func (ldbr *LDBReader) GetBlock(hash common.Hash, number uint64) *types.Block {
+func (ldbr *AccessorsChain) GetBlock(hash common.Hash, number uint64) *types.Block {
 	return rawdb.ReadBlock(ldbr.ethDbConnection, hash, number)
 }
 
-func (ldbr *LDBReader) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
+func (ldbr *AccessorsChain) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
 	return rawdb.ReadBodyRLP(ldbr.ethDbConnection, hash, number)
 }
 
-func (ldbr *LDBReader) GetCanonicalHash(number uint64) common.Hash {
+func (ldbr *AccessorsChain) GetCanonicalHash(number uint64) common.Hash {
 	return rawdb.ReadCanonicalHash(ldbr.ethDbConnection, number)
 }
 
-func (ldbr *LDBReader) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
+func (ldbr *AccessorsChain) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
 	return rawdb.ReadHeaderRLP(ldbr.ethDbConnection, hash, number)
 }

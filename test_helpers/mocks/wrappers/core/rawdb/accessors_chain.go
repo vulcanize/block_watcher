@@ -1,4 +1,4 @@
-package level
+package rawdb
 
 import (
 	"github.com/ethereum/go-ethereum/common"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type MockLevelDatabaseReader struct {
+type MockAccessorsChain struct {
 	getBlockPassedHash                                common.Hash
 	getBlockPassedNumber                              uint64
 	getBlockReturnBlock                               *types.Block
@@ -23,8 +23,8 @@ type MockLevelDatabaseReader struct {
 	getStateAndStorageTrieNodesReturnStorageTrieBytes [][]byte
 }
 
-func NewMockLevelDatabaseReader() *MockLevelDatabaseReader {
-	return &MockLevelDatabaseReader{
+func NewMockAccessorsChain() *MockAccessorsChain {
+	return &MockAccessorsChain{
 		getBlockPassedHash:                                common.Hash{},
 		getBlockPassedNumber:                              0,
 		getBlockReturnBlock:                               nil,
@@ -41,73 +41,73 @@ func NewMockLevelDatabaseReader() *MockLevelDatabaseReader {
 	}
 }
 
-func (mldr *MockLevelDatabaseReader) SetGetBlockReturnBlock(returnBlock *types.Block) {
+func (mldr *MockAccessorsChain) SetGetBlockReturnBlock(returnBlock *types.Block) {
 	mldr.getBlockReturnBlock = returnBlock
 }
 
-func (mldr *MockLevelDatabaseReader) SetGetCanonicalHashReturnHash(hash common.Hash) {
+func (mldr *MockAccessorsChain) SetGetCanonicalHashReturnHash(hash common.Hash) {
 	mldr.getCanonicalHashReturnHash = hash
 }
 
-func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnStateTrieBytes(returnBytes [][]byte) {
+func (mldr *MockAccessorsChain) SetGetStateTrieNodesReturnStateTrieBytes(returnBytes [][]byte) {
 	mldr.getStateAndStorageTrieNodesReturnStateTrieBytes = returnBytes
 }
 
-func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnStorageTrieBytes(returnBytes [][]byte) {
+func (mldr *MockAccessorsChain) SetGetStateTrieNodesReturnStorageTrieBytes(returnBytes [][]byte) {
 	mldr.getStateAndStorageTrieNodesReturnStorageTrieBytes = returnBytes
 }
 
-func (mldr *MockLevelDatabaseReader) SetGetStateTrieNodesReturnErr(err error) {
+func (mldr *MockAccessorsChain) SetGetStateTrieNodesReturnErr(err error) {
 	mldr.getStateAndStorageTrieNodesReturnErr = err
 }
 
-func (mldr *MockLevelDatabaseReader) GetBlock(hash common.Hash, number uint64) *types.Block {
+func (mldr *MockAccessorsChain) GetBlock(hash common.Hash, number uint64) *types.Block {
 	mldr.getBlockPassedHash = hash
 	mldr.getBlockPassedNumber = number
 	return mldr.getBlockReturnBlock
 }
 
-func (mldr *MockLevelDatabaseReader) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
+func (mldr *MockAccessorsChain) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
 	mldr.getBodyRLPPassedHash = hash
 	mldr.getBodyRLPPassedNumber = number
 	return nil
 }
 
-func (mldr *MockLevelDatabaseReader) GetCanonicalHash(number uint64) common.Hash {
+func (mldr *MockAccessorsChain) GetCanonicalHash(number uint64) common.Hash {
 	mldr.getCanonicalHashPassedNumber = number
 	return mldr.getCanonicalHashReturnHash
 }
 
-func (mldr *MockLevelDatabaseReader) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
+func (mldr *MockAccessorsChain) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
 	mldr.getHeaderRLPPassedHash = hash
 	mldr.getHeaderRLPPassedNumber = number
 	return nil
 }
 
-func (mldr *MockLevelDatabaseReader) GetStateAndStorageTrieNodes(root common.Hash) ([][]byte, [][]byte, error) {
+func (mldr *MockAccessorsChain) GetStateAndStorageTrieNodes(root common.Hash) ([][]byte, [][]byte, error) {
 	mldr.getStateAndStorageTrieNodesPassedRoot = root
 	return mldr.getStateAndStorageTrieNodesReturnStateTrieBytes, mldr.getStateAndStorageTrieNodesReturnStorageTrieBytes, mldr.getStateAndStorageTrieNodesReturnErr
 }
 
-func (mldr *MockLevelDatabaseReader) AssertGetBlockCalledWith(hash common.Hash, number uint64) {
+func (mldr *MockAccessorsChain) AssertGetBlockCalledWith(hash common.Hash, number uint64) {
 	Expect(mldr.getBlockPassedHash).To(Equal(hash))
 	Expect(mldr.getBlockPassedNumber).To(Equal(number))
 }
 
-func (mldr *MockLevelDatabaseReader) AssertGetBodyRLPCalledWith(hash common.Hash, number uint64) {
+func (mldr *MockAccessorsChain) AssertGetBodyRLPCalledWith(hash common.Hash, number uint64) {
 	Expect(mldr.getBodyRLPPassedHash).To(Equal(hash))
 	Expect(mldr.getBodyRLPPassedNumber).To(Equal(number))
 }
 
-func (mldr *MockLevelDatabaseReader) AssertGetCanonicalHashCalledWith(number uint64) {
+func (mldr *MockAccessorsChain) AssertGetCanonicalHashCalledWith(number uint64) {
 	Expect(mldr.getCanonicalHashPassedNumber).To(Equal(number))
 }
 
-func (mldr *MockLevelDatabaseReader) AssertGetHeaderRLPCalledWith(hash common.Hash, number uint64) {
+func (mldr *MockAccessorsChain) AssertGetHeaderRLPCalledWith(hash common.Hash, number uint64) {
 	Expect(mldr.getHeaderRLPPassedHash).To(Equal(hash))
 	Expect(mldr.getHeaderRLPPassedNumber).To(Equal(number))
 }
 
-func (mldr *MockLevelDatabaseReader) AssertGetStateTrieNodesCalledWith(root common.Hash) {
+func (mldr *MockAccessorsChain) AssertGetStateTrieNodesCalledWith(root common.Hash) {
 	Expect(mldr.getStateAndStorageTrieNodesPassedRoot).To(Equal(root))
 }

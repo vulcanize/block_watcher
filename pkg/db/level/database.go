@@ -3,17 +3,18 @@ package level
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/rawdb"
 )
 
 type Database struct {
-	reader          Reader
+	accessorsChain  rawdb.IAccessorsChain
 	stateComputer   IStateComputer
 	stateTrieReader IStateTrieReader
 }
 
-func NewLevelDatabase(ldbReader Reader, stateComputer IStateComputer, stateTrieReader IStateTrieReader) *Database {
+func NewLevelDatabase(accessorsChain rawdb.IAccessorsChain, stateComputer IStateComputer, stateTrieReader IStateTrieReader) *Database {
 	return &Database{
-		reader:          ldbReader,
+		accessorsChain:  accessorsChain,
 		stateComputer:   stateComputer,
 		stateTrieReader: stateTrieReader,
 	}
@@ -25,20 +26,20 @@ func (l Database) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *
 
 func (l Database) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
 	n := uint64(blockNumber)
-	h := l.reader.GetCanonicalHash(n)
-	return l.reader.GetBodyRLP(h, n), nil
+	h := l.accessorsChain.GetCanonicalHash(n)
+	return l.accessorsChain.GetBodyRLP(h, n), nil
 }
 
 func (l Database) GetBlockByBlockNumber(blockNumber int64) *types.Block {
 	n := uint64(blockNumber)
-	h := l.reader.GetCanonicalHash(n)
-	return l.reader.GetBlock(h, n)
+	h := l.accessorsChain.GetCanonicalHash(n)
+	return l.accessorsChain.GetBlock(h, n)
 }
 
 func (l Database) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
 	n := uint64(blockNumber)
-	h := l.reader.GetCanonicalHash(n)
-	return l.reader.GetHeaderRLP(h, n), nil
+	h := l.accessorsChain.GetCanonicalHash(n)
+	return l.accessorsChain.GetHeaderRLP(h, n), nil
 }
 
 func (l Database) GetStateAndStorageTrieNodes(root common.Hash) (stateTrieNodes, storageTrieNodes [][]byte, err error) {

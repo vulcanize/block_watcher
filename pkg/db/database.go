@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/vulcanize/eth-block-extractor/pkg/db/level"
 	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/rawdb"
 	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
 	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 )
@@ -41,7 +42,7 @@ func CreateDatabase(config DatabaseConfig) (Database, error) {
 		}
 		stateDatabase := state.NewDatabase(levelDBConnection)
 		stateTrieReader := createStateTrieReader(levelDBConnection, stateDatabase)
-		levelDBReader := level.NewLevelDatabaseReader(levelDBConnection)
+		levelDBReader := rawdb.NewAccessorsChain(levelDBConnection)
 		stateComputer, err := createStateComputer(levelDBConnection, stateDatabase)
 		if err != nil {
 			return nil, err
