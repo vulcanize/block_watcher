@@ -26,28 +26,28 @@ import (
 	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 )
 
-// createIpldForBlockHeadersCmd represents the createIpldForBlockHeaders command
-var createIpldForBlockHeadersCmd = &cobra.Command{
-	Use:   "createIpldForBlockHeaders",
+// createIpldsForBlockHeadersCmd represents the createIpldsForBlockHeaders command
+var createIpldsForBlockHeadersCmd = &cobra.Command{
+	Use:   "createIpldsForBlockHeaders",
 	Short: "Create IPLD objects for multiple blocks.",
 	Long: `Create IPLD objects for multiple blocks.
 
-e.g. ./eth-block-extractor createIpldForBlockHeaders -s 1234567 -e 4567890
+e.g. ./eth-block-extractor createIpldsForBlockHeaders -s 1234567 -e 4567890
 
 Under the hood, the command fetches the block header RLP data from LevelDB and
 puts it in IPFS, converting the data as an 'eth-block'.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		createIpldForBlockHeaders()
+		createIpldsForBlockHeaders()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(createIpldForBlockHeadersCmd)
-	createIpldForBlockHeadersCmd.Flags().Int64VarP(&startingBlockNumber, "starting-block-number", "s", 0, "First block number to create IPLD for.")
-	createIpldForBlockHeadersCmd.Flags().Int64VarP(&endingBlockNumber, "ending-block-number", "e", 5430000, "Last block number to create IPLD for.")
+	rootCmd.AddCommand(createIpldsForBlockHeadersCmd)
+	createIpldsForBlockHeadersCmd.Flags().Int64VarP(&startingBlockNumber, "starting-block-number", "s", 0, "First block number to create IPLD for.")
+	createIpldsForBlockHeadersCmd.Flags().Int64VarP(&endingBlockNumber, "ending-block-number", "e", 5900000, "Last block number to create IPLD for.")
 }
 
-func createIpldForBlockHeaders() {
+func createIpldsForBlockHeaders() {
 	if endingBlockNumber < startingBlockNumber {
 		log.Fatal("Ending block number must be greater than or equal to starting block number.")
 	}

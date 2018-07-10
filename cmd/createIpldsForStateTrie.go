@@ -47,7 +47,7 @@ func init() {
 	rootCmd.AddCommand(createIpldsForStateTrieCmd)
 	createIpldsForStateTrieCmd.Flags().BoolVarP(&computeState, "compute-state", "c", false, "Flag indicating state must be computed (non-archive node).")
 	createIpldsForStateTrieCmd.Flags().Int64VarP(&startingBlockNumber, "starting-block-number", "s", 0, "First block number to create IPLD for.")
-	createIpldsForStateTrieCmd.Flags().Int64VarP(&endingBlockNumber, "ending-block-number", "e", 5430000, "Last block number to create IPLD for.")
+	createIpldsForStateTrieCmd.Flags().Int64VarP(&endingBlockNumber, "ending-block-number", "e", 5900000, "Last block number to create IPLD for.")
 }
 
 func createIpldsForStateTrie() {

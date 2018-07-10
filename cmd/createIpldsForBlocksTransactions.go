@@ -43,7 +43,7 @@ The starting and ending block numbers specify the range of blocks for which to c
 func init() {
 	rootCmd.AddCommand(createIpldsForBlocksTransactionsCmd)
 	createIpldsForBlocksTransactionsCmd.Flags().Int64VarP(&startingBlockNumber, "starting-block-number", "s", 0, "First block number to create IPLD for.")
-	createIpldsForBlocksTransactionsCmd.Flags().Int64VarP(&endingBlockNumber, "ending-block-number", "e", 5430000, "Last block number to create IPLD for.")
+	createIpldsForBlocksTransactionsCmd.Flags().Int64VarP(&endingBlockNumber, "ending-block-number", "e", 5900000, "Last block number to create IPLD for.")
 }
 
 func createIpldsForBlocksTransactions() {
