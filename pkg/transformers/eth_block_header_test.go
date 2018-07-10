@@ -31,6 +31,15 @@ var _ = Describe("Eth block header transformer", func() {
 			log.SetOutput(ioutil.Discard)
 		})
 
+		It("returns error if ending block number is less than starting block number", func() {
+			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
+
+			err := transformer.Execute(1, 0)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError(transformers.ErrInvalidRange))
+		})
+
 		It("Fetches RLP data from ethereum db", func() {
 			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
 

@@ -19,6 +19,9 @@ func NewEthBlockReceiptTransformer(database db.Database, publisher ipfs.Publishe
 }
 
 func (transformer EthBlockReceiptTransformer) Execute(startingBlockNumber int64, endingBlockNumber int64) error {
+	if endingBlockNumber < startingBlockNumber {
+		return ErrInvalidRange
+	}
 	for i := startingBlockNumber; i <= endingBlockNumber; i++ {
 		receipts := transformer.database.GetBlockReceipts(i)
 		cids, err := transformer.publisher.Write(receipts)

@@ -17,6 +17,15 @@ var _ = Describe("Eth block receipts transformer", func() {
 		log.SetOutput(ioutil.Discard)
 	})
 
+	It("returns error if ending block number is less than starting block number", func() {
+		transformer := transformers.NewEthBlockReceiptTransformer(db.NewMockDatabase(), ipfs.NewMockPublisher())
+
+		err := transformer.Execute(1, 0)
+
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError(transformers.ErrInvalidRange))
+	})
+
 	It("fetches blocks' receipts from database", func() {
 		mockDatabase := db.NewMockDatabase()
 		transformer := transformers.NewEthBlockReceiptTransformer(mockDatabase, ipfs.NewMockPublisher())

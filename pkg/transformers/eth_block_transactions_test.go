@@ -19,6 +19,15 @@ var _ = Describe("Eth block transactions transformer", func() {
 			log.SetOutput(ioutil.Discard)
 		})
 
+		It("returns error if ending block number is less than starting block number", func() {
+			transformer := transformers.NewEthBlockTransactionsTransformer(db.NewMockDatabase(), ipfs.NewMockPublisher())
+
+			err := transformer.Execute(1, 0)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError(transformers.ErrInvalidRange))
+		})
+
 		It("fetches rlp data for block body", func() {
 			mockDB := db.NewMockDatabase()
 			mockDB.SetGetBlockBodyByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})

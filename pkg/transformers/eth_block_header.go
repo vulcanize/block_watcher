@@ -17,6 +17,9 @@ func NewEthBlockHeaderTransformer(ethDB db.Database, publisher ipfs.Publisher) *
 }
 
 func (t EthBlockHeaderTransformer) Execute(startingBlockNumber int64, endingBlockNumber int64) error {
+	if endingBlockNumber < startingBlockNumber {
+		return ErrInvalidRange
+	}
 	for i := startingBlockNumber; i <= endingBlockNumber; i++ {
 		blockData, err := t.database.GetBlockHeaderByBlockNumber(i)
 		if err != nil {

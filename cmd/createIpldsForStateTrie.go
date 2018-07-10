@@ -51,9 +51,6 @@ func init() {
 }
 
 func createIpldsForStateTrie() {
-	if endingBlockNumber < startingBlockNumber {
-		log.Fatal("Ending block number must be greater than or equal to starting block number.")
-	}
 	if computeState && startingBlockNumber != 0 {
 		log.Println("Computing state trie must begin at genesis block. Ignoring passed starting block number.")
 	}

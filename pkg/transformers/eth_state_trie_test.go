@@ -21,6 +21,15 @@ var _ = Describe("Eth state trie transformer", func() {
 		log.SetOutput(ioutil.Discard)
 	})
 
+	It("returns error if ending block number is less than starting block number", func() {
+		transformer := transformers.NewEthStateTrieTransformer(db.NewMockDatabase(), rlp.NewMockDecoder(), ipfs.NewMockPublisher(), ipfs.NewMockPublisher())
+
+		err := transformer.Execute(1, 0)
+
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError(transformers.ErrInvalidRange))
+	})
+
 	It("fetches block header for block", func() {
 		mockDB := db.NewMockDatabase()
 		mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})

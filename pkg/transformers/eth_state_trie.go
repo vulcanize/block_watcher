@@ -29,6 +29,9 @@ func NewEthStateTrieTransformer(database db.Database, decoder rlp.Decoder, state
 }
 
 func (t EthStateTrieTransformer) Execute(startingBlockNumber int64, endingBlockNumber int64) error {
+	if endingBlockNumber < startingBlockNumber {
+		return ErrInvalidRange
+	}
 	for i := startingBlockNumber; i <= endingBlockNumber; i++ {
 		root, err := t.getStateRootForBlock(i)
 		if err != nil {

@@ -16,6 +16,9 @@ func NewEthBlockTransactionsTransformer(db db.Database, publisher ipfs.Publisher
 }
 
 func (t EthBlockTransactionsTransformer) Execute(startingBlockNumber int64, endingBlockNumber int64) error {
+	if endingBlockNumber < startingBlockNumber {
+		return ErrInvalidRange
+	}
 	for i := startingBlockNumber; i <= endingBlockNumber; i++ {
 		blockData, err := t.database.GetBlockBodyByBlockNumber(i)
 		if err != nil {

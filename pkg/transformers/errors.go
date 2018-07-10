@@ -1,11 +1,16 @@
 package transformers
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 const (
 	GetBlockRlpErr = "Error fetching block RLP data"
 	PutIpldErr     = "Error writing to IPFS"
 )
+
+var ErrInvalidRange = errors.New("ending block number must be greater than or equal to starting block number")
 
 type ExecuteError struct {
 	msg string
