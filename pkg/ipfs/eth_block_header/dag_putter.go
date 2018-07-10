@@ -22,8 +22,9 @@ func NewBlockHeaderDagPutter(adder ipfs.Adder, decoder rlp.Decoder) *BlockHeader
 	return &BlockHeaderDagPutter{adder: adder, decoder: decoder}
 }
 
-func (bhdp *BlockHeaderDagPutter) DagPut(raw []byte) ([]string, error) {
-	nd, err := bhdp.getNodeForBlockHeader(raw)
+func (bhdp *BlockHeaderDagPutter) DagPut(raw interface{}) ([]string, error) {
+	input := raw.([]byte)
+	nd, err := bhdp.getNodeForBlockHeader(input)
 	if err != nil {
 		return nil, err
 	}

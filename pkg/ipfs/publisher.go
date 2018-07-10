@@ -12,7 +12,7 @@ func (ie Error) Error() string {
 }
 
 type Publisher interface {
-	Write(blockData []byte) ([]string, error)
+	Write(input interface{}) ([]string, error)
 }
 
 type BlockDataPublisher struct {
@@ -23,8 +23,8 @@ func NewIpfsPublisher(dagPutter DagPutter) *BlockDataPublisher {
 	return &BlockDataPublisher{DagPutter: dagPutter}
 }
 
-func (ip *BlockDataPublisher) Write(blockData []byte) ([]string, error) {
-	cids, err := ip.DagPutter.DagPut(blockData)
+func (ip *BlockDataPublisher) Write(input interface{}) ([]string, error) {
+	cids, err := ip.DagPutter.DagPut(input)
 	if err != nil {
 		return nil, err
 	}

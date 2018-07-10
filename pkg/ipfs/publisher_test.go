@@ -18,7 +18,7 @@ var _ = Describe("IPFS publisher", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mockDagPutter.Called).To(BeTrue())
-		Expect(mockDagPutter.PassedBytes).To(Equal(fakeBytes))
+		Expect(mockDagPutter.PassedInterface).To(Equal(fakeBytes))
 	})
 
 	It("returns error if dag put fails", func() {

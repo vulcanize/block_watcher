@@ -58,7 +58,7 @@ var _ = Describe("Eth block transactions transformer", func() {
 			err := transformer.Execute(blockNumber, blockNumber)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockPublisher.AssertWriteCalledWith(fakeRawData)
+			mockPublisher.AssertWriteCalledWithBytes(fakeRawData)
 		})
 
 		It("returns error if publishing data returns error", func() {
@@ -106,7 +106,7 @@ var _ = Describe("Eth block transactions transformer", func() {
 			err := transformer.Execute(startingBlockNumber, endingBlockNumber)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockPublisher.AssertWriteCalledWith(fakeRawData)
+			mockPublisher.AssertWriteCalledWithBytes(fakeRawData)
 		})
 	})
 })

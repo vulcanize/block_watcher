@@ -11,6 +11,8 @@ type MockAccessorsChain struct {
 	getBlockPassedHash                                common.Hash
 	getBlockPassedNumber                              uint64
 	getBlockReturnBlock                               *types.Block
+	getBlockReceiptsPassedHash                        common.Hash
+	getBlockReceiptsPassedNumber                      uint64
 	getBodyRLPPassedHash                              common.Hash
 	getBodyRLPPassedNumber                            uint64
 	getCanonicalHashPassedNumber                      uint64
@@ -41,73 +43,84 @@ func NewMockAccessorsChain() *MockAccessorsChain {
 	}
 }
 
-func (mldr *MockAccessorsChain) SetGetBlockReturnBlock(returnBlock *types.Block) {
-	mldr.getBlockReturnBlock = returnBlock
+func (accessor *MockAccessorsChain) SetGetBlockReturnBlock(returnBlock *types.Block) {
+	accessor.getBlockReturnBlock = returnBlock
 }
 
-func (mldr *MockAccessorsChain) SetGetCanonicalHashReturnHash(hash common.Hash) {
-	mldr.getCanonicalHashReturnHash = hash
+func (accessor *MockAccessorsChain) SetGetCanonicalHashReturnHash(hash common.Hash) {
+	accessor.getCanonicalHashReturnHash = hash
 }
 
-func (mldr *MockAccessorsChain) SetGetStateTrieNodesReturnStateTrieBytes(returnBytes [][]byte) {
-	mldr.getStateAndStorageTrieNodesReturnStateTrieBytes = returnBytes
+func (accessor *MockAccessorsChain) SetGetStateTrieNodesReturnStateTrieBytes(returnBytes [][]byte) {
+	accessor.getStateAndStorageTrieNodesReturnStateTrieBytes = returnBytes
 }
 
-func (mldr *MockAccessorsChain) SetGetStateTrieNodesReturnStorageTrieBytes(returnBytes [][]byte) {
-	mldr.getStateAndStorageTrieNodesReturnStorageTrieBytes = returnBytes
+func (accessor *MockAccessorsChain) SetGetStateTrieNodesReturnStorageTrieBytes(returnBytes [][]byte) {
+	accessor.getStateAndStorageTrieNodesReturnStorageTrieBytes = returnBytes
 }
 
-func (mldr *MockAccessorsChain) SetGetStateTrieNodesReturnErr(err error) {
-	mldr.getStateAndStorageTrieNodesReturnErr = err
+func (accessor *MockAccessorsChain) SetGetStateTrieNodesReturnErr(err error) {
+	accessor.getStateAndStorageTrieNodesReturnErr = err
 }
 
-func (mldr *MockAccessorsChain) GetBlock(hash common.Hash, number uint64) *types.Block {
-	mldr.getBlockPassedHash = hash
-	mldr.getBlockPassedNumber = number
-	return mldr.getBlockReturnBlock
+func (accessor *MockAccessorsChain) GetBlock(hash common.Hash, number uint64) *types.Block {
+	accessor.getBlockPassedHash = hash
+	accessor.getBlockPassedNumber = number
+	return accessor.getBlockReturnBlock
 }
 
-func (mldr *MockAccessorsChain) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
-	mldr.getBodyRLPPassedHash = hash
-	mldr.getBodyRLPPassedNumber = number
+func (accessor *MockAccessorsChain) GetBlockReceipts(hash common.Hash, number uint64) types.Receipts {
+	accessor.getBlockReceiptsPassedHash = hash
+	accessor.getBlockReceiptsPassedNumber = number
 	return nil
 }
 
-func (mldr *MockAccessorsChain) GetCanonicalHash(number uint64) common.Hash {
-	mldr.getCanonicalHashPassedNumber = number
-	return mldr.getCanonicalHashReturnHash
-}
-
-func (mldr *MockAccessorsChain) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
-	mldr.getHeaderRLPPassedHash = hash
-	mldr.getHeaderRLPPassedNumber = number
+func (accessor *MockAccessorsChain) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
+	accessor.getBodyRLPPassedHash = hash
+	accessor.getBodyRLPPassedNumber = number
 	return nil
 }
 
-func (mldr *MockAccessorsChain) GetStateAndStorageTrieNodes(root common.Hash) ([][]byte, [][]byte, error) {
-	mldr.getStateAndStorageTrieNodesPassedRoot = root
-	return mldr.getStateAndStorageTrieNodesReturnStateTrieBytes, mldr.getStateAndStorageTrieNodesReturnStorageTrieBytes, mldr.getStateAndStorageTrieNodesReturnErr
+func (accessor *MockAccessorsChain) GetCanonicalHash(number uint64) common.Hash {
+	accessor.getCanonicalHashPassedNumber = number
+	return accessor.getCanonicalHashReturnHash
 }
 
-func (mldr *MockAccessorsChain) AssertGetBlockCalledWith(hash common.Hash, number uint64) {
-	Expect(mldr.getBlockPassedHash).To(Equal(hash))
-	Expect(mldr.getBlockPassedNumber).To(Equal(number))
+func (accessor *MockAccessorsChain) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
+	accessor.getHeaderRLPPassedHash = hash
+	accessor.getHeaderRLPPassedNumber = number
+	return nil
 }
 
-func (mldr *MockAccessorsChain) AssertGetBodyRLPCalledWith(hash common.Hash, number uint64) {
-	Expect(mldr.getBodyRLPPassedHash).To(Equal(hash))
-	Expect(mldr.getBodyRLPPassedNumber).To(Equal(number))
+func (accessor *MockAccessorsChain) GetStateAndStorageTrieNodes(root common.Hash) ([][]byte, [][]byte, error) {
+	accessor.getStateAndStorageTrieNodesPassedRoot = root
+	return accessor.getStateAndStorageTrieNodesReturnStateTrieBytes, accessor.getStateAndStorageTrieNodesReturnStorageTrieBytes, accessor.getStateAndStorageTrieNodesReturnErr
 }
 
-func (mldr *MockAccessorsChain) AssertGetCanonicalHashCalledWith(number uint64) {
-	Expect(mldr.getCanonicalHashPassedNumber).To(Equal(number))
+func (accessor *MockAccessorsChain) AssertGetBlockCalledWith(hash common.Hash, number uint64) {
+	Expect(accessor.getBlockPassedHash).To(Equal(hash))
+	Expect(accessor.getBlockPassedNumber).To(Equal(number))
 }
 
-func (mldr *MockAccessorsChain) AssertGetHeaderRLPCalledWith(hash common.Hash, number uint64) {
-	Expect(mldr.getHeaderRLPPassedHash).To(Equal(hash))
-	Expect(mldr.getHeaderRLPPassedNumber).To(Equal(number))
+func (accessor *MockAccessorsChain) AssertGetBlockReceiptsCalledWith(hash common.Hash, number uint64) {
+	Expect(accessor.getBlockReceiptsPassedHash).To(Equal(hash))
+	Expect(accessor.getBlockReceiptsPassedNumber).To(Equal(number))
 }
 
-func (mldr *MockAccessorsChain) AssertGetStateTrieNodesCalledWith(root common.Hash) {
-	Expect(mldr.getStateAndStorageTrieNodesPassedRoot).To(Equal(root))
+func (accessor *MockAccessorsChain) AssertGetBodyRLPCalledWith(hash common.Hash, number uint64) {
+	Expect(accessor.getBodyRLPPassedHash).To(Equal(hash))
+	Expect(accessor.getBodyRLPPassedNumber).To(Equal(number))
+}
+
+func (accessor *MockAccessorsChain) AssertGetCanonicalHashCalledWith(number uint64) {
+	Expect(accessor.getCanonicalHashPassedNumber).To(Equal(number))
+}
+
+func (accessor *MockAccessorsChain) AssertGetHeaderRLPCalledWith(hash common.Hash, number uint64) {
+	Expect(accessor.getHeaderRLPPassedHash).To(Equal(hash))
+	Expect(accessor.getHeaderRLPPassedNumber).To(Equal(number))
+}
+
+func (accessor *MockAccessorsChain) AssertGetStateTrieNodesCalledWith(root common.Hash) {
+	Expect(accessor.getStateAndStorageTrieNodesPassedRoot).To(Equal(root))
 }

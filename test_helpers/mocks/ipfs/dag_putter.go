@@ -1,16 +1,16 @@
 package ipfs
 
 type MockDagPutter struct {
-	Called      bool
-	PassedBytes []byte
-	Err         error
+	Called          bool
+	PassedInterface interface{}
+	Err             error
 }
 
 func NewMockDagPutter() *MockDagPutter {
 	return &MockDagPutter{
-		Called:      false,
-		PassedBytes: nil,
-		Err:         nil,
+		Called:          false,
+		PassedInterface: nil,
+		Err:             nil,
 	}
 }
 
@@ -18,8 +18,8 @@ func (mdp *MockDagPutter) SetError(err error) {
 	mdp.Err = err
 }
 
-func (mdp *MockDagPutter) DagPut(raw []byte) ([]string, error) {
+func (mdp *MockDagPutter) DagPut(raw interface{}) ([]string, error) {
 	mdp.Called = true
-	mdp.PassedBytes = raw
+	mdp.PassedInterface = raw
 	return nil, mdp.Err
 }

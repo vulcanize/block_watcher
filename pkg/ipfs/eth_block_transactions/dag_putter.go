@@ -23,9 +23,10 @@ func NewBlockTransactionsDagPutter(adder ipfs.Adder, decoder rlp.Decoder) *Block
 	return &BlockTransactionsDagPutter{adder: adder, decoder: decoder}
 }
 
-func (bbdp *BlockTransactionsDagPutter) DagPut(raw []byte) ([]string, error) {
+func (bbdp *BlockTransactionsDagPutter) DagPut(raw interface{}) ([]string, error) {
 	var blockBody types.Body
-	err := bbdp.decoder.Decode(raw, &blockBody)
+	input := raw.([]byte)
+	err := bbdp.decoder.Decode(input, &blockBody)
 	if err != nil {
 		return nil, err
 	}

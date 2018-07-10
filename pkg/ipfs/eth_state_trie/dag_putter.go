@@ -17,8 +17,9 @@ func NewStateTrieDagPutter(adder ipfs.Adder) *StateTrieDagPutter {
 	return &StateTrieDagPutter{adder: adder}
 }
 
-func (stdp StateTrieDagPutter) DagPut(raw []byte) ([]string, error) {
-	stateTrieNode, err := stdp.getStateTrieNode(raw)
+func (stdp StateTrieDagPutter) DagPut(raw interface{}) ([]string, error) {
+	input := raw.([]byte)
+	stateTrieNode, err := stdp.getStateTrieNode(input)
 	if err != nil {
 		return nil, err
 	}

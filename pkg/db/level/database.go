@@ -20,28 +20,34 @@ func NewLevelDatabase(accessorsChain rawdb.IAccessorsChain, stateComputer IState
 	}
 }
 
-func (l Database) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error) {
-	return l.stateComputer.ComputeBlockStateTrie(currentBlock, parentBlock)
+func (db Database) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error) {
+	return db.stateComputer.ComputeBlockStateTrie(currentBlock, parentBlock)
 }
 
-func (l Database) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
+func (db Database) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
 	n := uint64(blockNumber)
-	h := l.accessorsChain.GetCanonicalHash(n)
-	return l.accessorsChain.GetBodyRLP(h, n), nil
+	h := db.accessorsChain.GetCanonicalHash(n)
+	return db.accessorsChain.GetBodyRLP(h, n), nil
 }
 
-func (l Database) GetBlockByBlockNumber(blockNumber int64) *types.Block {
+func (db Database) GetBlockByBlockNumber(blockNumber int64) *types.Block {
 	n := uint64(blockNumber)
-	h := l.accessorsChain.GetCanonicalHash(n)
-	return l.accessorsChain.GetBlock(h, n)
+	h := db.accessorsChain.GetCanonicalHash(n)
+	return db.accessorsChain.GetBlock(h, n)
 }
 
-func (l Database) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
+func (db Database) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
 	n := uint64(blockNumber)
-	h := l.accessorsChain.GetCanonicalHash(n)
-	return l.accessorsChain.GetHeaderRLP(h, n), nil
+	h := db.accessorsChain.GetCanonicalHash(n)
+	return db.accessorsChain.GetHeaderRLP(h, n), nil
 }
 
-func (l Database) GetStateAndStorageTrieNodes(root common.Hash) (stateTrieNodes, storageTrieNodes [][]byte, err error) {
-	return l.stateTrieReader.GetStateAndStorageTrieNodes(root)
+func (db Database) GetBlockReceipts(blockNumber int64) types.Receipts {
+	n := uint64(blockNumber)
+	h := db.accessorsChain.GetCanonicalHash(n)
+	return db.accessorsChain.GetBlockReceipts(h, n)
+}
+
+func (db Database) GetStateAndStorageTrieNodes(root common.Hash) (stateTrieNodes, storageTrieNodes [][]byte, err error) {
+	return db.stateTrieReader.GetStateAndStorageTrieNodes(root)
 }

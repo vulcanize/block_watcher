@@ -3,7 +3,7 @@ package eth_block_header
 import (
 	"github.com/ethereum/go-ethereum/core/types"
 
-	ipld "gx/ipfs/QmWi2BYBL5gJ3CiAiQchg6rn1A8iBsrWy51EYxvHVjFvLb/go-ipld-format"
+	"gx/ipfs/QmWi2BYBL5gJ3CiAiQchg6rn1A8iBsrWy51EYxvHVjFvLb/go-ipld-format"
 	"gx/ipfs/QmapdYm1b22Frv3k17fqrBYTFRxwiaVJkB299Mfn33edeB/go-cid"
 )
 
@@ -38,19 +38,19 @@ func (EthBlockHeaderNode) Tree(path string, depth int) []string {
 	panic("implement me")
 }
 
-func (EthBlockHeaderNode) ResolveLink(path []string) (*ipld.Link, []string, error) {
+func (EthBlockHeaderNode) ResolveLink(path []string) (*format.Link, []string, error) {
 	panic("implement me")
 }
 
-func (EthBlockHeaderNode) Copy() ipld.Node {
+func (EthBlockHeaderNode) Copy() format.Node {
 	panic("implement me")
 }
 
-func (EthBlockHeaderNode) Links() []*ipld.Link {
+func (EthBlockHeaderNode) Links() []*format.Link {
 	panic("implement me")
 }
 
-func (EthBlockHeaderNode) Stat() (*ipld.NodeStat, error) {
+func (EthBlockHeaderNode) Stat() (*format.NodeStat, error) {
 	panic("implement me")
 }
 

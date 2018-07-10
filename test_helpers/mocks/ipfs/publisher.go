@@ -7,38 +7,38 @@ import (
 
 type MockPublisher struct {
 	err              error
-	passedBlockDatas [][]byte
+	passedBlockDatas []interface{}
 	returnStrings    [][]string
 }
 
 func NewMockPublisher() *MockPublisher {
 	return &MockPublisher{
 		err:              nil,
-		passedBlockDatas: [][]byte{},
+		passedBlockDatas: []interface{}{},
 		returnStrings:    nil,
 	}
 }
 
-func (mp *MockPublisher) SetReturnStrings(returnBytes [][]string) {
-	mp.returnStrings = returnBytes
+func (publisher *MockPublisher) SetReturnStrings(returnBytes [][]string) {
+	publisher.returnStrings = returnBytes
 }
 
-func (mp *MockPublisher) SetError(err error) {
-	mp.err = err
+func (publisher *MockPublisher) SetError(err error) {
+	publisher.err = err
 }
 
-func (mp *MockPublisher) Write(blockData []byte) ([]string, error) {
-	mp.passedBlockDatas = append(mp.passedBlockDatas, blockData)
-	if mp.err != nil {
-		return nil, mp.err
+func (publisher *MockPublisher) Write(input interface{}) ([]string, error) {
+	publisher.passedBlockDatas = append(publisher.passedBlockDatas, input)
+	if publisher.err != nil {
+		return nil, publisher.err
 	}
 	var stringsToReturn []string
-	if len(mp.returnStrings) > 0 {
-		stringsToReturn = mp.returnStrings[0]
-		if len(mp.returnStrings) > 1 {
-			mp.returnStrings = mp.returnStrings[1:]
+	if len(publisher.returnStrings) > 0 {
+		stringsToReturn = publisher.returnStrings[0]
+		if len(publisher.returnStrings) > 1 {
+			publisher.returnStrings = publisher.returnStrings[1:]
 		} else {
-			mp.returnStrings = [][]string{{test_helpers.FakeString}}
+			publisher.returnStrings = [][]string{{test_helpers.FakeString}}
 		}
 	} else {
 		stringsToReturn = []string{test_helpers.FakeString}
@@ -46,11 +46,20 @@ func (mp *MockPublisher) Write(blockData []byte) ([]string, error) {
 	return stringsToReturn, nil
 }
 
-func (mp *MockPublisher) AssertWriteCalledWith(blockDatas [][]byte) {
-	for i := 0; i < len(blockDatas); i++ {
-		Expect(mp.passedBlockDatas).To(ContainElement(blockDatas[i]))
+func (publisher *MockPublisher) AssertWriteCalledWithBytes(inputs [][]byte) {
+	for i := 0; i < len(inputs); i++ {
+		Expect(publisher.passedBlockDatas).To(ContainElement(inputs[i]))
 	}
-	for i := 0; i < len(mp.passedBlockDatas); i++ {
-		Expect(blockDatas).To(ContainElement(mp.passedBlockDatas[i]))
+	for i := 0; i < len(publisher.passedBlockDatas); i++ {
+		Expect(inputs).To(ContainElement(publisher.passedBlockDatas[i]))
+	}
+}
+
+func (publisher *MockPublisher) AssertWriteCalledWithInterfaces(interfaces []interface{}) {
+	for i := 0; i < len(interfaces); i++ {
+		Expect(publisher.passedBlockDatas).To(ContainElement(interfaces[i]))
+	}
+	for i := 0; i < len(publisher.passedBlockDatas); i++ {
+		Expect(interfaces).To(ContainElement(publisher.passedBlockDatas[i]))
 	}
 }

@@ -2,7 +2,7 @@ package eth_block_transactions
 
 import (
 	"github.com/ethereum/go-ethereum/core/types"
-	ipld "gx/ipfs/QmWi2BYBL5gJ3CiAiQchg6rn1A8iBsrWy51EYxvHVjFvLb/go-ipld-format"
+	"gx/ipfs/QmWi2BYBL5gJ3CiAiQchg6rn1A8iBsrWy51EYxvHVjFvLb/go-ipld-format"
 	"gx/ipfs/QmapdYm1b22Frv3k17fqrBYTFRxwiaVJkB299Mfn33edeB/go-cid"
 )
 
@@ -37,19 +37,19 @@ func (EthTransactionNode) Tree(path string, depth int) []string {
 	panic("implement me")
 }
 
-func (EthTransactionNode) ResolveLink(path []string) (*ipld.Link, []string, error) {
+func (EthTransactionNode) ResolveLink(path []string) (*format.Link, []string, error) {
 	panic("implement me")
 }
 
-func (EthTransactionNode) Copy() ipld.Node {
+func (EthTransactionNode) Copy() format.Node {
 	panic("implement me")
 }
 
-func (EthTransactionNode) Links() []*ipld.Link {
+func (EthTransactionNode) Links() []*format.Link {
 	panic("implement me")
 }
 
-func (EthTransactionNode) Stat() (*ipld.NodeStat, error) {
+func (EthTransactionNode) Stat() (*format.NodeStat, error) {
 	panic("implement me")
 }
 

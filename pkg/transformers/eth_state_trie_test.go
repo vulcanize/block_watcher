@@ -16,7 +16,7 @@ import (
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/rlp"
 )
 
-var _ = Describe("Ethereum state trie transformer", func() {
+var _ = Describe("Eth state trie transformer", func() {
 	BeforeEach(func() {
 		log.SetOutput(ioutil.Discard)
 	})
@@ -63,7 +63,7 @@ var _ = Describe("Ethereum state trie transformer", func() {
 	It("returns err if fetching state trie returns err", func() {
 		mockDB := db.NewMockDatabase()
 		mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-		mockDB.SetGetStateTrieNodesError(test_helpers.FakeError)
+		mockDB.SetGetStateAndStorageTrieNodesError(test_helpers.FakeError)
 		mockDecoder := rlp.NewMockDecoder()
 		mockDecoder.SetReturnOut(&types.Header{Root: common.Hash{}})
 		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockDecoder, ipfs.NewMockPublisher(), ipfs.NewMockPublisher())
@@ -88,7 +88,7 @@ var _ = Describe("Ethereum state trie transformer", func() {
 		err := transformer.Execute(0, 0)
 
 		Expect(err).NotTo(HaveOccurred())
-		mockStateTriePublisher.AssertWriteCalledWith(fakeStateTrieNodes)
+		mockStateTriePublisher.AssertWriteCalledWithBytes(fakeStateTrieNodes)
 	})
 
 	It("writes storage trie nodes to ipfs", func() {
@@ -105,6 +105,6 @@ var _ = Describe("Ethereum state trie transformer", func() {
 		err := transformer.Execute(0, 0)
 
 		Expect(err).NotTo(HaveOccurred())
-		mockStorageTriePublisher.AssertWriteCalledWith(fakeStateTrieNodes)
+		mockStorageTriePublisher.AssertWriteCalledWithBytes(fakeStateTrieNodes)
 	})
 })

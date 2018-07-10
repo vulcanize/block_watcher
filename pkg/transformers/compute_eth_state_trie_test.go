@@ -16,7 +16,7 @@ import (
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/rlp"
 )
 
-var _ = Describe("Compute historical state transformer", func() {
+var _ = Describe("Compute eth state trie transformer", func() {
 	BeforeEach(func() {
 		log.SetOutput(ioutil.Discard)
 	})
@@ -65,7 +65,7 @@ var _ = Describe("Compute historical state transformer", func() {
 		It("returns error if fetching state trie nodes fails", func() {
 			mockDB := db.NewMockDatabase()
 			mockDB.SetGetBlockHeaderByBlockNumberReturnBytes([][]byte{{1, 2, 3, 4, 5}})
-			mockDB.SetGetStateTrieNodesError(test_helpers.FakeError)
+			mockDB.SetGetStateAndStorageTrieNodesError(test_helpers.FakeError)
 			decoder := rlp.NewMockDecoder()
 			decoder.SetReturnOut(&types.Header{})
 			transformer := transformers.NewComputeEthStateTrieTransformer(mockDB, decoder, ipfs.NewMockPublisher(), ipfs.NewMockPublisher())
@@ -89,7 +89,7 @@ var _ = Describe("Compute historical state transformer", func() {
 			err := transformer.Execute(0)
 
 			Expect(err).NotTo(HaveOccurred())
-			stateTriePublisher.AssertWriteCalledWith(fakeStateTrieNodes)
+			stateTriePublisher.AssertWriteCalledWithBytes(fakeStateTrieNodes)
 		})
 
 		It("returns error if publishing state trie nodes fails", func() {
@@ -155,7 +155,7 @@ var _ = Describe("Compute historical state transformer", func() {
 			err := transformer.Execute(1)
 
 			Expect(err).NotTo(HaveOccurred())
-			stateTriePublisher.AssertWriteCalledWith(fakeStateTrieNodes)
+			stateTriePublisher.AssertWriteCalledWithBytes(fakeStateTrieNodes)
 		})
 
 		It("returns error if publishing state trie nodes fails", func() {
@@ -190,7 +190,7 @@ var _ = Describe("Compute historical state transformer", func() {
 			err := transformer.Execute(1)
 
 			Expect(err).NotTo(HaveOccurred())
-			storageTriePublisher.AssertWriteCalledWith(fakeStorageTrieNodes)
+			storageTriePublisher.AssertWriteCalledWithBytes(fakeStorageTrieNodes)
 		})
 
 		It("returns error if publishing storage trie nodes fails", func() {

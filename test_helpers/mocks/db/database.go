@@ -19,6 +19,8 @@ type MockDatabase struct {
 	getBlockHeaderByBlockNumberErr                    error
 	getBlockHeaderByBlockNumberPassedBlockNumbers     []int64
 	getBlockHeaderByBlockNumberReturnBytes            [][]byte
+	getBlockReceiptsPassedBlockNumbers                []int64
+	getBlockReceiptsReturnReceipts                    types.Receipts
 	getStateAndStorageTrieNodesErr                    error
 	getStateAndStorageTrieNodesPassedRoot             common.Hash
 	getStateAndStorageTrieNodesReturnStateTrieBytes   [][]byte
@@ -39,6 +41,8 @@ func NewMockDatabase() *MockDatabase {
 		getBlockHeaderByBlockNumberErr:                    nil,
 		getBlockHeaderByBlockNumberPassedBlockNumbers:     nil,
 		getBlockHeaderByBlockNumberReturnBytes:            nil,
+		getBlockReceiptsPassedBlockNumbers:                nil,
+		getBlockReceiptsReturnReceipts:                    nil,
 		getStateAndStorageTrieNodesErr:                    nil,
 		getStateAndStorageTrieNodesPassedRoot:             common.Hash{},
 		getStateAndStorageTrieNodesReturnStateTrieBytes:   nil,
@@ -46,104 +50,117 @@ func NewMockDatabase() *MockDatabase {
 	}
 }
 
-func (md *MockDatabase) SetComputeBlockStateTrieReturnHash(hash common.Hash) {
-	md.computeBlockStateTrieReturnHash = hash
+func (db *MockDatabase) SetComputeBlockStateTrieError(err error) {
+	db.computeBlockStateTrieErr = err
 }
 
-func (md *MockDatabase) SetGetBlockBodyByBlockNumberReturnBytes(returnBytes [][]byte) {
-	md.getBlockBodyByBlockNumberReturnBytes = returnBytes
+func (db *MockDatabase) SetComputeBlockStateTrieReturnHash(hash common.Hash) {
+	db.computeBlockStateTrieReturnHash = hash
 }
 
-func (md *MockDatabase) SetGetBlockByBlockNumberReturnBlock(returnBlock *types.Block) {
-	md.getBlockByBlockNumberReturnBlock = returnBlock
+func (db *MockDatabase) SetGetBlockBodyByBlockNumberError(err error) {
+	db.getBlockBodyByBlockNumberErr = err
 }
 
-func (md *MockDatabase) SetGetBlockHeaderByBlockNumberReturnBytes(returnBytes [][]byte) {
-	md.getBlockHeaderByBlockNumberReturnBytes = returnBytes
+func (db *MockDatabase) SetGetBlockBodyByBlockNumberReturnBytes(returnBytes [][]byte) {
+	db.getBlockBodyByBlockNumberReturnBytes = returnBytes
 }
 
-func (md *MockDatabase) SetGetStateAndStorageTrieNodesReturnStateTrieBytes(returnBytes [][]byte) {
-	md.getStateAndStorageTrieNodesReturnStateTrieBytes = returnBytes
+func (db *MockDatabase) SetGetBlockByBlockNumberReturnBlock(returnBlock *types.Block) {
+	db.getBlockByBlockNumberReturnBlock = returnBlock
 }
 
-func (md *MockDatabase) SetGetStateAndStorageTrieNodesReturnStorageTrieBytes(returnBytes [][]byte) {
-	md.getStateAndStorageTrieNodesReturnStorageTrieBytes = returnBytes
+func (db *MockDatabase) SetGetBlockHeaderByBlockNumberError(err error) {
+	db.getBlockHeaderByBlockNumberErr = err
 }
 
-func (md *MockDatabase) SetComputeBlockStateTrieError(err error) {
-	md.computeBlockStateTrieErr = err
+func (db *MockDatabase) SetGetBlockHeaderByBlockNumberReturnBytes(returnBytes [][]byte) {
+	db.getBlockHeaderByBlockNumberReturnBytes = returnBytes
 }
 
-func (md *MockDatabase) SetGetBlockBodyByBlockNumberError(err error) {
-	md.getBlockBodyByBlockNumberErr = err
+func (db *MockDatabase) SetGetBlockReceiptsReturnReceipts(receipts types.Receipts) {
+	db.getBlockReceiptsReturnReceipts = receipts
 }
 
-func (md *MockDatabase) SetGetBlockHeaderByBlockNumberError(err error) {
-	md.getBlockHeaderByBlockNumberErr = err
+func (db *MockDatabase) SetGetStateAndStorageTrieNodesError(err error) {
+	db.getStateAndStorageTrieNodesErr = err
 }
 
-func (md *MockDatabase) SetGetStateTrieNodesError(err error) {
-	md.getStateAndStorageTrieNodesErr = err
+func (db *MockDatabase) SetGetStateAndStorageTrieNodesReturnStateTrieBytes(returnBytes [][]byte) {
+	db.getStateAndStorageTrieNodesReturnStateTrieBytes = returnBytes
 }
 
-func (md *MockDatabase) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error) {
-	md.computeBlockStateTriePassedCurrentBlock = currentBlock
-	md.computeBlockStateTriePassedParentBlock = parentBlock
-	return md.computeBlockStateTrieReturnHash, md.computeBlockStateTrieErr
+func (db *MockDatabase) SetGetStateAndStorageTrieNodesReturnStorageTrieBytes(returnBytes [][]byte) {
+	db.getStateAndStorageTrieNodesReturnStorageTrieBytes = returnBytes
 }
 
-func (md *MockDatabase) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
-	md.getBlockBodyByBlockNumberPassedBlockNumbers = append(md.getBlockBodyByBlockNumberPassedBlockNumbers, blockNumber)
-	if md.getBlockBodyByBlockNumberErr != nil {
-		return nil, md.getBlockBodyByBlockNumberErr
+func (db *MockDatabase) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error) {
+	db.computeBlockStateTriePassedCurrentBlock = currentBlock
+	db.computeBlockStateTriePassedParentBlock = parentBlock
+	return db.computeBlockStateTrieReturnHash, db.computeBlockStateTrieErr
+}
+
+func (db *MockDatabase) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
+	db.getBlockBodyByBlockNumberPassedBlockNumbers = append(db.getBlockBodyByBlockNumberPassedBlockNumbers, blockNumber)
+	if db.getBlockBodyByBlockNumberErr != nil {
+		return nil, db.getBlockBodyByBlockNumberErr
 	}
-	returnBytes := md.getBlockBodyByBlockNumberReturnBytes[0]
-	md.getBlockBodyByBlockNumberReturnBytes = md.getBlockBodyByBlockNumberReturnBytes[1:]
+	returnBytes := db.getBlockBodyByBlockNumberReturnBytes[0]
+	db.getBlockBodyByBlockNumberReturnBytes = db.getBlockBodyByBlockNumberReturnBytes[1:]
 	return returnBytes, nil
 }
 
-func (md *MockDatabase) GetBlockByBlockNumber(blockNumber int64) *types.Block {
-	md.getBlockByBlockNumberPassedNumbers = append(md.getBlockByBlockNumberPassedNumbers, blockNumber)
-	return md.getBlockByBlockNumberReturnBlock
+func (db *MockDatabase) GetBlockByBlockNumber(blockNumber int64) *types.Block {
+	db.getBlockByBlockNumberPassedNumbers = append(db.getBlockByBlockNumberPassedNumbers, blockNumber)
+	return db.getBlockByBlockNumberReturnBlock
 }
 
-func (md *MockDatabase) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
-	md.getBlockHeaderByBlockNumberPassedBlockNumbers = append(md.getBlockHeaderByBlockNumberPassedBlockNumbers, blockNumber)
-	if md.getBlockHeaderByBlockNumberErr != nil {
-		return nil, md.getBlockHeaderByBlockNumberErr
+func (db *MockDatabase) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
+	db.getBlockHeaderByBlockNumberPassedBlockNumbers = append(db.getBlockHeaderByBlockNumberPassedBlockNumbers, blockNumber)
+	if db.getBlockHeaderByBlockNumberErr != nil {
+		return nil, db.getBlockHeaderByBlockNumberErr
 	}
-	returnBytes := md.getBlockHeaderByBlockNumberReturnBytes[0]
-	md.getBlockHeaderByBlockNumberReturnBytes = md.getBlockHeaderByBlockNumberReturnBytes[1:]
+	returnBytes := db.getBlockHeaderByBlockNumberReturnBytes[0]
+	db.getBlockHeaderByBlockNumberReturnBytes = db.getBlockHeaderByBlockNumberReturnBytes[1:]
 	return returnBytes, nil
 }
 
-func (md *MockDatabase) GetStateAndStorageTrieNodes(root common.Hash) ([][]byte, [][]byte, error) {
-	md.getStateAndStorageTrieNodesPassedRoot = root
-	return md.getStateAndStorageTrieNodesReturnStateTrieBytes, md.getStateAndStorageTrieNodesReturnStorageTrieBytes, md.getStateAndStorageTrieNodesErr
+func (db *MockDatabase) GetBlockReceipts(blockNumber int64) types.Receipts {
+	db.getBlockReceiptsPassedBlockNumbers = append(db.getBlockReceiptsPassedBlockNumbers, blockNumber)
+	return db.getBlockReceiptsReturnReceipts
 }
 
-func (md *MockDatabase) AssertComputeBlockStateTrieCalledWith(currentBlock *types.Block, parentBlock *types.Block) {
-	Expect(md.computeBlockStateTriePassedCurrentBlock).To(Equal(currentBlock))
-	Expect(md.computeBlockStateTriePassedParentBlock).To(Equal(parentBlock))
+func (db *MockDatabase) GetStateAndStorageTrieNodes(root common.Hash) ([][]byte, [][]byte, error) {
+	db.getStateAndStorageTrieNodesPassedRoot = root
+	return db.getStateAndStorageTrieNodesReturnStateTrieBytes, db.getStateAndStorageTrieNodesReturnStorageTrieBytes, db.getStateAndStorageTrieNodesErr
 }
 
-func (md *MockDatabase) AssertGetBlockBodyByBlockNumberCalledWith(blockNumbers []int64) {
-	Expect(md.getBlockBodyByBlockNumberPassedBlockNumbers).To(Equal(blockNumbers))
+func (db *MockDatabase) AssertComputeBlockStateTrieCalledWith(currentBlock *types.Block, parentBlock *types.Block) {
+	Expect(db.computeBlockStateTriePassedCurrentBlock).To(Equal(currentBlock))
+	Expect(db.computeBlockStateTriePassedParentBlock).To(Equal(parentBlock))
 }
 
-func (md *MockDatabase) AssertGetBlockByBlockNumberCalledwith(blockNumbers []int64) {
+func (db *MockDatabase) AssertGetBlockBodyByBlockNumberCalledWith(blockNumbers []int64) {
+	Expect(db.getBlockBodyByBlockNumberPassedBlockNumbers).To(Equal(blockNumbers))
+}
+
+func (db *MockDatabase) AssertGetBlockByBlockNumberCalledwith(blockNumbers []int64) {
 	for i := 0; i < len(blockNumbers); i++ {
-		Expect(md.getBlockByBlockNumberPassedNumbers).To(ContainElement(blockNumbers[i]))
+		Expect(db.getBlockByBlockNumberPassedNumbers).To(ContainElement(blockNumbers[i]))
 	}
-	for i := 0; i < len(md.getBlockByBlockNumberPassedNumbers); i++ {
-		Expect(blockNumbers).To(ContainElement(md.getBlockByBlockNumberPassedNumbers[i]))
+	for i := 0; i < len(db.getBlockByBlockNumberPassedNumbers); i++ {
+		Expect(blockNumbers).To(ContainElement(db.getBlockByBlockNumberPassedNumbers[i]))
 	}
 }
 
-func (md *MockDatabase) AssertGetBlockHeaderByBlockNumberCalledWith(blockNumbers []int64) {
-	Expect(md.getBlockHeaderByBlockNumberPassedBlockNumbers).To(Equal(blockNumbers))
+func (db *MockDatabase) AssertGetBlockHeaderByBlockNumberCalledWith(blockNumbers []int64) {
+	Expect(db.getBlockHeaderByBlockNumberPassedBlockNumbers).To(Equal(blockNumbers))
 }
 
-func (md *MockDatabase) AssertGetStateTrieNodesCalledWith(root common.Hash) {
-	Expect(md.getStateAndStorageTrieNodesPassedRoot).To(Equal(root))
+func (db *MockDatabase) AssertGetBlockReceiptsCalledWith(blockNumbers []int64) {
+	Expect(db.getBlockReceiptsPassedBlockNumbers).To(Equal(blockNumbers))
+}
+
+func (db *MockDatabase) AssertGetStateTrieNodesCalledWith(root common.Hash) {
+	Expect(db.getStateAndStorageTrieNodesPassedRoot).To(Equal(root))
 }

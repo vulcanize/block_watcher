@@ -13,7 +13,7 @@ import (
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
 )
 
-var _ = Describe("EthBlockHeaderTransformer", func() {
+var _ = Describe("Eth block header transformer", func() {
 	var mockDB *db.MockDatabase
 	var mockPublisher *ipfs.MockPublisher
 
@@ -57,7 +57,7 @@ var _ = Describe("EthBlockHeaderTransformer", func() {
 			err := transformer.Execute(blockNumber, blockNumber)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockPublisher.AssertWriteCalledWith([][]byte{fakeBytes})
+			mockPublisher.AssertWriteCalledWithBytes([][]byte{fakeBytes})
 		})
 
 		It("Returns err if persisting block RLP data to IPFS fails", func() {
@@ -69,7 +69,7 @@ var _ = Describe("EthBlockHeaderTransformer", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(transformers.NewExecuteError(transformers.PutIpldErr, test_helpers.FakeError)))
 			mockDB.AssertGetBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
-			mockPublisher.AssertWriteCalledWith([][]byte{fakeBytes})
+			mockPublisher.AssertWriteCalledWithBytes([][]byte{fakeBytes})
 		})
 	})
 
@@ -105,7 +105,7 @@ var _ = Describe("EthBlockHeaderTransformer", func() {
 			err := transformer.Execute(startingBlockNumber, endingBlockNumber)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockPublisher.AssertWriteCalledWith([][]byte{fakeRlpBytes, fakeRlpBytes})
+			mockPublisher.AssertWriteCalledWithBytes([][]byte{fakeRlpBytes, fakeRlpBytes})
 		})
 	})
 

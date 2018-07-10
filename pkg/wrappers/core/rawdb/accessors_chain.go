@@ -10,6 +10,7 @@ import (
 
 type IAccessorsChain interface {
 	GetBlock(hash common.Hash, number uint64) *types.Block
+	GetBlockReceipts(hash common.Hash, number uint64) types.Receipts
 	GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue
 	GetCanonicalHash(number uint64) common.Hash
 	GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue
@@ -25,6 +26,10 @@ func NewAccessorsChain(databaseConnection ethdb.Database) *AccessorsChain {
 
 func (ldbr *AccessorsChain) GetBlock(hash common.Hash, number uint64) *types.Block {
 	return rawdb.ReadBlock(ldbr.ethDbConnection, hash, number)
+}
+
+func (ldbr *AccessorsChain) GetBlockReceipts(hash common.Hash, number uint64) types.Receipts {
+	return rawdb.ReadReceipts(ldbr.ethDbConnection, hash, number)
 }
 
 func (ldbr *AccessorsChain) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {

@@ -37,28 +37,38 @@ A [VulcanizeDB](https://github.com/vulcanize/VulcanizeDB) transformer for creati
 ## Running the createIpldForBlockHeader command
 - This command creates an IPLD for the header of a single Ethereum block.
 - `./eth-block-extractor createIpldForBlockHeader --config <config.toml> --block-number <block-number>`
-- Note: block number argument is required.
 
 ## Running the createIpldForBlockHeaders command
 - This command creates IPLDs for headers in a range of Ethereum blocks.
 - `./eth-block-extractor createIpldForBlockHeaders --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
-- Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number.
+- Note: ending block number must be greater than starting block number.
 
 ## Running the createIpldsForBlockTransactions command
 - This command creates IPLDs for transactions on an Ethereum block.
 - `./eth-block-extractor createIpldsForBlockTransactions --config <config.toml> --block-number <block-number>`
-- Note: block number argument is required.
 
 ## Running the createIpldsForBlocksTransactions command
 - This command creates IPLDs for transactions on a range of Ethereum blocks.
 - `./eth-block-extractor createIpldsForBlocksTransactions --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
-- Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number.
+- Note: ending block number must be greater than starting block number.
+
+## Running the createIpldsForBlockReceipts command
+- This command creates IPLDs for transaction receipts on an Ethereum block.
+- `./eth-block-extractor createIpldsForBlockReceipts --config <config.toml> --block-number <block-number>`
+
+## Running the createIpldsForBlocksReceipts command
+- This command creates IPLDs for transaction receipts in a range of Ethereum blocks.
+- `./eth-block-extractor createIpldsForBlocksReceipts --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
+- Note: ending block number must be greater than starting block number.
 
 ## Running the createIpldsForStateTrie command
 - Note: this command is _very_ expensive in terms of time and memory. Probably only feasible to execute on an archive node for a narrow range of blocks.
 - This command creates IPLDs for state and storage trie nodes in a range of Ethereum blocks.
 - `./eth-block-extractor createIpldsForStateTrie --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
-- Note: requires running an archive node. LevelDB lookup for state trie will fail otherwise due to state pruning.
+- Note:
+  - Optionally pass the `--compute-state` flag if not running an archive node (in which case state is pruned) - this will dynamically generate the state for each block by processing transactions.
+  - Computing state requires beginning at the genesis block, so starting block number flag is ignored if not 0.
+  - Ending block number must be greater than starting block number.
 
 ## Running the tests
 ```

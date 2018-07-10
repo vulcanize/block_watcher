@@ -17,14 +17,15 @@ func NewStorageTrieDagPutter(adder ipfs.Adder) *StorageTrieDagPutter {
 	return &StorageTrieDagPutter{adder: adder}
 }
 
-func (stdp StorageTrieDagPutter) DagPut(raw []byte) ([]string, error) {
-	cid, err := util.RawToCid(EthStorageTrieNodeCode, raw)
+func (stdp StorageTrieDagPutter) DagPut(raw interface{}) ([]string, error) {
+	input := raw.([]byte)
+	cid, err := util.RawToCid(EthStorageTrieNodeCode, input)
 	if err != nil {
 		return nil, err
 	}
 	node := &EthStorageTrieNode{
 		cid:     cid,
-		rawdata: raw,
+		rawdata: input,
 	}
 	err = stdp.adder.Add(node)
 	if err != nil {
