@@ -55,7 +55,8 @@ A [VulcanizeDB](https://github.com/vulcanize/VulcanizeDB) transformer for creati
 - Note: starting and ending block number arguments are required, and ending block number must be greater than starting block number.
 
 ## Running the createIpldsForStateTrie command
-- This command creates IPLDs for state trie nodes in a range of Ethereum blocks.
+- Note: this command is _very_ expensive in terms of time and memory. Probably only feasible to execute on an archive node for a narrow range of blocks.
+- This command creates IPLDs for state and storage trie nodes in a range of Ethereum blocks.
 - `./eth-block-extractor createIpldsForStateTrie --config <config.toml> --starting-block-number <block-number> --ending-block-number <block-number>`
 - Note: requires running an archive node. LevelDB lookup for state trie will fail otherwise due to state pruning.
 
