@@ -17,7 +17,6 @@ type MockDatabase struct {
 	getBlockByBlockNumberReturnBlock                  *types.Block
 	getBlockHeaderByBlockNumberPassedBlockNumbers     []int64
 	getBlockHeaderByBlockNumberReturnHeader           *types.Header
-	getRawBlockHeaderByBlockNumberErr                 error
 	getRawBlockHeaderByBlockNumberPassedBlockNumbers  []int64
 	getRawBlockHeaderByBlockNumberReturnBytes         [][]byte
 	getBlockReceiptsPassedBlockNumbers                []int64
@@ -40,7 +39,6 @@ func NewMockDatabase() *MockDatabase {
 		getBlockByBlockNumberReturnBlock:                  nil,
 		getBlockHeaderByBlockNumberPassedBlockNumbers:     nil,
 		getBlockHeaderByBlockNumberReturnHeader:           nil,
-		getRawBlockHeaderByBlockNumberErr:                 nil,
 		getRawBlockHeaderByBlockNumberPassedBlockNumbers:  nil,
 		getRawBlockHeaderByBlockNumberReturnBytes:         nil,
 		getBlockReceiptsPassedBlockNumbers:                nil,
@@ -70,10 +68,6 @@ func (db *MockDatabase) SetGetBlockByBlockNumberReturnBlock(returnBlock *types.B
 
 func (db *MockDatabase) SetGetBlockHeaderByBlockNumberReturnHeader(header *types.Header) {
 	db.getBlockHeaderByBlockNumberReturnHeader = header
-}
-
-func (db *MockDatabase) SetGetRawBlockHeaderByBlockNumberError(err error) {
-	db.getRawBlockHeaderByBlockNumberErr = err
 }
 
 func (db *MockDatabase) SetGetRawBlockHeaderByBlockNumberReturnBytes(returnBytes [][]byte) {
@@ -119,14 +113,11 @@ func (db *MockDatabase) GetBlockHeaderByBlockNumber(blockNumber int64) *types.He
 	return db.getBlockHeaderByBlockNumberReturnHeader
 }
 
-func (db *MockDatabase) GetRawBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
+func (db *MockDatabase) GetRawBlockHeaderByBlockNumber(blockNumber int64) []byte {
 	db.getRawBlockHeaderByBlockNumberPassedBlockNumbers = append(db.getRawBlockHeaderByBlockNumberPassedBlockNumbers, blockNumber)
-	if db.getRawBlockHeaderByBlockNumberErr != nil {
-		return nil, db.getRawBlockHeaderByBlockNumberErr
-	}
 	returnBytes := db.getRawBlockHeaderByBlockNumberReturnBytes[0]
 	db.getRawBlockHeaderByBlockNumberReturnBytes = db.getRawBlockHeaderByBlockNumberReturnBytes[1:]
-	return returnBytes, nil
+	return returnBytes
 }
 
 func (db *MockDatabase) GetBlockReceipts(blockNumber int64) types.Receipts {

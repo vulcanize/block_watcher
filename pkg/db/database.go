@@ -30,7 +30,7 @@ type Database interface {
 	GetBlockByBlockNumber(blockNumber int64) *types.Block
 	GetBlockBodyByBlockNumber(blockNumber int64) *types.Body
 	GetBlockHeaderByBlockNumber(blockNumber int64) *types.Header
-	GetRawBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
+	GetRawBlockHeaderByBlockNumber(blockNumber int64) []byte
 	GetBlockReceipts(blockNumber int64) types.Receipts
 	GetStateAndStorageTrieNodes(root common.Hash) (stateTrieNodes, storageTrieNodes [][]byte, err error)
 }

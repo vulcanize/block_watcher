@@ -21,10 +21,7 @@ func (t EthBlockHeaderTransformer) Execute(startingBlockNumber int64, endingBloc
 		return ErrInvalidRange
 	}
 	for i := startingBlockNumber; i <= endingBlockNumber; i++ {
-		blockData, err := t.database.GetRawBlockHeaderByBlockNumber(i)
-		if err != nil {
-			return NewExecuteError(GetBlockRlpErr, err)
-		}
+		blockData := t.database.GetRawBlockHeaderByBlockNumber(i)
 		output, err := t.publisher.Write(blockData)
 		if err != nil {
 			return NewExecuteError(PutIpldErr, err)

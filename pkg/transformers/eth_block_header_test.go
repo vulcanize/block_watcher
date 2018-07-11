@@ -49,17 +49,6 @@ var _ = Describe("Eth block header transformer", func() {
 			mockDB.AssertGetRawBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
 		})
 
-		It("Returns error if fetching block RLP data from ethereum DB fails", func() {
-			mockDB.SetGetRawBlockHeaderByBlockNumberError(test_helpers.FakeError)
-			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
-
-			err := transformer.Execute(blockNumber, blockNumber)
-
-			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(transformers.NewExecuteError(transformers.GetBlockRlpErr, test_helpers.FakeError)))
-			mockDB.AssertGetRawBlockHeaderByBlockNumberCalledWith([]int64{blockNumber})
-		})
-
 		It("Persists block RLP data to IPFS", func() {
 			transformer := transformers.NewEthBlockHeaderTransformer(mockDB, mockPublisher)
 
