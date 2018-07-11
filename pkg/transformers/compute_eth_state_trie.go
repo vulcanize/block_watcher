@@ -3,10 +3,8 @@ package transformers
 import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/vulcanize/eth-block-extractor/pkg/db"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 	"log"
 )
 
@@ -17,15 +15,13 @@ const (
 
 type ComputeEthStateTrieTransformer struct {
 	database             db.Database
-	decoder              rlp.Decoder
 	stateTriePublisher   ipfs.Publisher
 	storageTriePublisher ipfs.Publisher
 }
 
-func NewComputeEthStateTrieTransformer(database db.Database, decoder rlp.Decoder, stateTriePublisher, storageTriePublisher ipfs.Publisher) *ComputeEthStateTrieTransformer {
+func NewComputeEthStateTrieTransformer(database db.Database, stateTriePublisher, storageTriePublisher ipfs.Publisher) *ComputeEthStateTrieTransformer {
 	return &ComputeEthStateTrieTransformer{
 		database:             database,
-		decoder:              decoder,
 		stateTriePublisher:   stateTriePublisher,
 		storageTriePublisher: storageTriePublisher,
 	}
@@ -69,12 +65,7 @@ func (t ComputeEthStateTrieTransformer) Execute(endingBlockNumber int64) error {
 }
 
 func (t ComputeEthStateTrieTransformer) getStateRootForBlock(blockNumber int64) (root common.Hash, err error) {
-	var header types.Header
-	rawHeader, err := t.database.GetBlockHeaderByBlockNumber(blockNumber)
-	if err != nil {
-		return root, fmt.Errorf("Error fetching header for block %d: %s\n", blockNumber, err)
-	}
-	err = t.decoder.Decode(rawHeader, &header)
+	header := t.database.GetBlockHeaderByBlockNumber(blockNumber)
 	if err != nil {
 		return root, err
 	}

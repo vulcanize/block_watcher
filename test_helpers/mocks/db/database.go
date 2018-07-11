@@ -15,9 +15,11 @@ type MockDatabase struct {
 	getBlockBodyByBlockNumberReturnBodies             []*types.Body
 	getBlockByBlockNumberPassedNumbers                []int64
 	getBlockByBlockNumberReturnBlock                  *types.Block
-	getBlockHeaderByBlockNumberErr                    error
 	getBlockHeaderByBlockNumberPassedBlockNumbers     []int64
-	getBlockHeaderByBlockNumberReturnBytes            [][]byte
+	getBlockHeaderByBlockNumberReturnHeader           *types.Header
+	getRawBlockHeaderByBlockNumberErr                 error
+	getRawBlockHeaderByBlockNumberPassedBlockNumbers  []int64
+	getRawBlockHeaderByBlockNumberReturnBytes         [][]byte
 	getBlockReceiptsPassedBlockNumbers                []int64
 	getBlockReceiptsReturnReceipts                    types.Receipts
 	getStateAndStorageTrieNodesErr                    error
@@ -36,9 +38,11 @@ func NewMockDatabase() *MockDatabase {
 		getBlockBodyByBlockNumberReturnBodies:             nil,
 		getBlockByBlockNumberPassedNumbers:                nil,
 		getBlockByBlockNumberReturnBlock:                  nil,
-		getBlockHeaderByBlockNumberErr:                    nil,
 		getBlockHeaderByBlockNumberPassedBlockNumbers:     nil,
-		getBlockHeaderByBlockNumberReturnBytes:            nil,
+		getBlockHeaderByBlockNumberReturnHeader:           nil,
+		getRawBlockHeaderByBlockNumberErr:                 nil,
+		getRawBlockHeaderByBlockNumberPassedBlockNumbers:  nil,
+		getRawBlockHeaderByBlockNumberReturnBytes:         nil,
 		getBlockReceiptsPassedBlockNumbers:                nil,
 		getBlockReceiptsReturnReceipts:                    nil,
 		getStateAndStorageTrieNodesErr:                    nil,
@@ -64,12 +68,16 @@ func (db *MockDatabase) SetGetBlockByBlockNumberReturnBlock(returnBlock *types.B
 	db.getBlockByBlockNumberReturnBlock = returnBlock
 }
 
-func (db *MockDatabase) SetGetBlockHeaderByBlockNumberError(err error) {
-	db.getBlockHeaderByBlockNumberErr = err
+func (db *MockDatabase) SetGetBlockHeaderByBlockNumberReturnHeader(header *types.Header) {
+	db.getBlockHeaderByBlockNumberReturnHeader = header
 }
 
-func (db *MockDatabase) SetGetBlockHeaderByBlockNumberReturnBytes(returnBytes [][]byte) {
-	db.getBlockHeaderByBlockNumberReturnBytes = returnBytes
+func (db *MockDatabase) SetGetRawBlockHeaderByBlockNumberError(err error) {
+	db.getRawBlockHeaderByBlockNumberErr = err
+}
+
+func (db *MockDatabase) SetGetRawBlockHeaderByBlockNumberReturnBytes(returnBytes [][]byte) {
+	db.getRawBlockHeaderByBlockNumberReturnBytes = returnBytes
 }
 
 func (db *MockDatabase) SetGetBlockReceiptsReturnReceipts(receipts types.Receipts) {
@@ -106,13 +114,18 @@ func (db *MockDatabase) GetBlockByBlockNumber(blockNumber int64) *types.Block {
 	return db.getBlockByBlockNumberReturnBlock
 }
 
-func (db *MockDatabase) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
+func (db *MockDatabase) GetBlockHeaderByBlockNumber(blockNumber int64) *types.Header {
 	db.getBlockHeaderByBlockNumberPassedBlockNumbers = append(db.getBlockHeaderByBlockNumberPassedBlockNumbers, blockNumber)
-	if db.getBlockHeaderByBlockNumberErr != nil {
-		return nil, db.getBlockHeaderByBlockNumberErr
+	return db.getBlockHeaderByBlockNumberReturnHeader
+}
+
+func (db *MockDatabase) GetRawBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
+	db.getRawBlockHeaderByBlockNumberPassedBlockNumbers = append(db.getRawBlockHeaderByBlockNumberPassedBlockNumbers, blockNumber)
+	if db.getRawBlockHeaderByBlockNumberErr != nil {
+		return nil, db.getRawBlockHeaderByBlockNumberErr
 	}
-	returnBytes := db.getBlockHeaderByBlockNumberReturnBytes[0]
-	db.getBlockHeaderByBlockNumberReturnBytes = db.getBlockHeaderByBlockNumberReturnBytes[1:]
+	returnBytes := db.getRawBlockHeaderByBlockNumberReturnBytes[0]
+	db.getRawBlockHeaderByBlockNumberReturnBytes = db.getRawBlockHeaderByBlockNumberReturnBytes[1:]
 	return returnBytes, nil
 }
 
@@ -146,6 +159,10 @@ func (db *MockDatabase) AssertGetBlockByBlockNumberCalledwith(blockNumbers []int
 
 func (db *MockDatabase) AssertGetBlockHeaderByBlockNumberCalledWith(blockNumbers []int64) {
 	Expect(db.getBlockHeaderByBlockNumberPassedBlockNumbers).To(Equal(blockNumbers))
+}
+
+func (db *MockDatabase) AssertGetRawBlockHeaderByBlockNumberCalledWith(blockNumbers []int64) {
+	Expect(db.getRawBlockHeaderByBlockNumberPassedBlockNumbers).To(Equal(blockNumbers))
 }
 
 func (db *MockDatabase) AssertGetBlockReceiptsCalledWith(blockNumbers []int64) {

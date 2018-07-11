@@ -29,7 +29,8 @@ type Database interface {
 	ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error)
 	GetBlockByBlockNumber(blockNumber int64) *types.Block
 	GetBlockBodyByBlockNumber(blockNumber int64) *types.Body
-	GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
+	GetBlockHeaderByBlockNumber(blockNumber int64) *types.Header
+	GetRawBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
 	GetBlockReceipts(blockNumber int64) types.Receipts
 	GetStateAndStorageTrieNodes(root common.Hash) (stateTrieNodes, storageTrieNodes [][]byte, err error)
 }
@@ -42,7 +43,7 @@ func CreateDatabase(config DatabaseConfig) (Database, error) {
 			return nil, ReadError{msg: "Failed to connect to LevelDB", err: err}
 		}
 		stateDatabase := state.NewDatabase(levelDBConnection)
-		stateTrieReader := createStateTrieReader(levelDBConnection, stateDatabase)
+		stateTrieReader := createStateTrieReader(stateDatabase)
 		levelDBReader := rawdb.NewAccessorsChain(levelDBConnection)
 		stateComputer, err := createStateComputer(levelDBConnection, stateDatabase)
 		if err != nil {
@@ -55,7 +56,7 @@ func CreateDatabase(config DatabaseConfig) (Database, error) {
 	}
 }
 
-func createStateTrieReader(databaseConnection ethdb.Database, stateDatabase state.GethStateDatabase) level.IStateTrieReader {
+func createStateTrieReader(stateDatabase state.GethStateDatabase) level.IStateTrieReader {
 	decoder := rlp.RlpDecoder{}
 	storageTrieReader := level.NewStorageTrieReader(stateDatabase, decoder)
 	return level.NewStateTrieReader(stateDatabase, storageTrieReader)

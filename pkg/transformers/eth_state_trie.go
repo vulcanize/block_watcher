@@ -5,24 +5,19 @@ import (
 	"log"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-
 	"github.com/vulcanize/eth-block-extractor/pkg/db"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 )
 
 type EthStateTrieTransformer struct {
 	database             db.Database
-	decoder              rlp.Decoder
 	stateTriePublisher   ipfs.Publisher
 	storageTriePublisher ipfs.Publisher
 }
 
-func NewEthStateTrieTransformer(database db.Database, decoder rlp.Decoder, stateTriePublisher, storageTriePublisher ipfs.Publisher) *EthStateTrieTransformer {
+func NewEthStateTrieTransformer(database db.Database, stateTriePublisher, storageTriePublisher ipfs.Publisher) *EthStateTrieTransformer {
 	return &EthStateTrieTransformer{
 		database:             database,
-		decoder:              decoder,
 		stateTriePublisher:   stateTriePublisher,
 		storageTriePublisher: storageTriePublisher,
 	}
@@ -57,12 +52,7 @@ func (t EthStateTrieTransformer) Execute(startingBlockNumber int64, endingBlockN
 }
 
 func (t EthStateTrieTransformer) getStateRootForBlock(blockNumber int64) (root common.Hash, err error) {
-	var header types.Header
-	rawHeader, err := t.database.GetBlockHeaderByBlockNumber(blockNumber)
-	if err != nil {
-		return common.Hash{}, fmt.Errorf("Error fetching header for block %d: %s\n", blockNumber, err)
-	}
-	err = t.decoder.Decode(rawHeader, &header)
+	header := t.database.GetBlockHeaderByBlockNumber(blockNumber)
 	if err != nil {
 		return root, err
 	}

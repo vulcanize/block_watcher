@@ -51,14 +51,13 @@ var _ = Describe("Database", func() {
 
 		It("invokes the chain accessor to query for block body data", func() {
 			mockAccessorsChain := rawdb.NewMockAccessorsChain()
-			hash := common.HexToHash("abcde")
-			mockAccessorsChain.SetGetCanonicalHashReturnHash(hash)
+			mockAccessorsChain.SetGetCanonicalHashReturnHash(test_helpers.FakeHash)
 			db := level.NewLevelDatabase(mockAccessorsChain, level_wrapper.NewMockStateComputer(), level_wrapper.NewMockStateTrieReader())
 			num := int64(123456)
 
 			db.GetBlockBodyByBlockNumber(num)
 
-			mockAccessorsChain.AssertGetBodyRLPCalledWith(hash, uint64(num))
+			mockAccessorsChain.AssertGetBodyRLPCalledWith(test_helpers.FakeHash, uint64(num))
 		})
 	})
 
@@ -75,24 +74,46 @@ var _ = Describe("Database", func() {
 
 		It("invokes the chain accessor to query for block", func() {
 			mockAccessorsChain := rawdb.NewMockAccessorsChain()
-			hash := common.HexToHash("abcde")
-			mockAccessorsChain.SetGetCanonicalHashReturnHash(hash)
+			mockAccessorsChain.SetGetCanonicalHashReturnHash(test_helpers.FakeHash)
 			db := level.NewLevelDatabase(mockAccessorsChain, level_wrapper.NewMockStateComputer(), level_wrapper.NewMockStateTrieReader())
 			num := int64(123456)
 
 			db.GetBlockByBlockNumber(num)
 
-			mockAccessorsChain.AssertGetBlockCalledWith(hash, uint64(num))
+			mockAccessorsChain.AssertGetBlockCalledWith(test_helpers.FakeHash, uint64(num))
 		})
 	})
 
-	Describe("Getting block header data", func() {
+	Describe("Getting block header", func() {
 		It("invokes the chain accessor to query for block hash by block number", func() {
 			mockAccessorsChain := rawdb.NewMockAccessorsChain()
 			db := level.NewLevelDatabase(mockAccessorsChain, level_wrapper.NewMockStateComputer(), level_wrapper.NewMockStateTrieReader())
 			num := int64(123456)
 
-			_, err := db.GetBlockHeaderByBlockNumber(num)
+			db.GetBlockHeaderByBlockNumber(num)
+
+			mockAccessorsChain.AssertGetCanonicalHashCalledWith(uint64(num))
+		})
+
+		It("invokes the chain accessor to query for block header", func() {
+			mockAccessorsChain := rawdb.NewMockAccessorsChain()
+			mockAccessorsChain.SetGetCanonicalHashReturnHash(test_helpers.FakeHash)
+			db := level.NewLevelDatabase(mockAccessorsChain, level_wrapper.NewMockStateComputer(), level_wrapper.NewMockStateTrieReader())
+			num := int64(123456)
+
+			db.GetBlockHeaderByBlockNumber(num)
+
+			mockAccessorsChain.AssertGetHeaderCalledWith(test_helpers.FakeHash, uint64(num))
+		})
+	})
+
+	Describe("Getting raw block header data", func() {
+		It("invokes the chain accessor to query for block hash by block number", func() {
+			mockAccessorsChain := rawdb.NewMockAccessorsChain()
+			db := level.NewLevelDatabase(mockAccessorsChain, level_wrapper.NewMockStateComputer(), level_wrapper.NewMockStateTrieReader())
+			num := int64(123456)
+
+			_, err := db.GetRawBlockHeaderByBlockNumber(num)
 
 			Expect(err).NotTo(HaveOccurred())
 			mockAccessorsChain.AssertGetCanonicalHashCalledWith(uint64(num))
@@ -100,15 +121,14 @@ var _ = Describe("Database", func() {
 
 		It("invokes the chain accessor to query for block header data", func() {
 			mockAccessorsChain := rawdb.NewMockAccessorsChain()
-			hash := common.HexToHash("abcde")
-			mockAccessorsChain.SetGetCanonicalHashReturnHash(hash)
+			mockAccessorsChain.SetGetCanonicalHashReturnHash(test_helpers.FakeHash)
 			db := level.NewLevelDatabase(mockAccessorsChain, level_wrapper.NewMockStateComputer(), level_wrapper.NewMockStateTrieReader())
 			num := int64(123456)
 
-			_, err := db.GetBlockHeaderByBlockNumber(num)
+			_, err := db.GetRawBlockHeaderByBlockNumber(num)
 
 			Expect(err).NotTo(HaveOccurred())
-			mockAccessorsChain.AssertGetHeaderRLPCalledWith(hash, uint64(num))
+			mockAccessorsChain.AssertGetHeaderRLPCalledWith(test_helpers.FakeHash, uint64(num))
 		})
 	})
 

@@ -17,6 +17,8 @@ type MockAccessorsChain struct {
 	getBodyRLPPassedNumber                            uint64
 	getCanonicalHashPassedNumber                      uint64
 	getCanonicalHashReturnHash                        common.Hash
+	getHeaderPassedHash                               common.Hash
+	getHeaderPassedNumber                             uint64
 	getHeaderRLPPassedHash                            common.Hash
 	getHeaderRLPPassedNumber                          uint64
 	getStateAndStorageTrieNodesPassedRoot             common.Hash
@@ -86,6 +88,12 @@ func (accessor *MockAccessorsChain) GetCanonicalHash(number uint64) common.Hash 
 	return accessor.getCanonicalHashReturnHash
 }
 
+func (accessor *MockAccessorsChain) GetHeader(hash common.Hash, number uint64) *types.Header {
+	accessor.getHeaderPassedHash = hash
+	accessor.getHeaderPassedNumber = number
+	return nil
+}
+
 func (accessor *MockAccessorsChain) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
 	accessor.getHeaderRLPPassedHash = hash
 	accessor.getHeaderRLPPassedNumber = number
@@ -114,6 +122,11 @@ func (accessor *MockAccessorsChain) AssertGetBodyRLPCalledWith(hash common.Hash,
 
 func (accessor *MockAccessorsChain) AssertGetCanonicalHashCalledWith(number uint64) {
 	Expect(accessor.getCanonicalHashPassedNumber).To(Equal(number))
+}
+
+func (accessor *MockAccessorsChain) AssertGetHeaderCalledWith(hash common.Hash, number uint64) {
+	Expect(accessor.getHeaderPassedHash).To(Equal(hash))
+	Expect(accessor.getHeaderPassedNumber).To(Equal(number))
 }
 
 func (accessor *MockAccessorsChain) AssertGetHeaderRLPCalledWith(hash common.Hash, number uint64) {

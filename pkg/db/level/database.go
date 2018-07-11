@@ -36,7 +36,13 @@ func (db Database) GetBlockByBlockNumber(blockNumber int64) *types.Block {
 	return db.accessorsChain.GetBlock(h, n)
 }
 
-func (db Database) GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
+func (db Database) GetBlockHeaderByBlockNumber(blockNumber int64) *types.Header {
+	n := uint64(blockNumber)
+	h := db.accessorsChain.GetCanonicalHash(n)
+	return db.accessorsChain.GetHeader(h, n)
+}
+
+func (db Database) GetRawBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error) {
 	n := uint64(blockNumber)
 	h := db.accessorsChain.GetCanonicalHash(n)
 	return db.accessorsChain.GetHeaderRLP(h, n), nil

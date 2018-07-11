@@ -13,6 +13,7 @@ type IAccessorsChain interface {
 	GetBlockReceipts(hash common.Hash, number uint64) types.Receipts
 	GetBody(hash common.Hash, number uint64) *types.Body
 	GetCanonicalHash(number uint64) common.Hash
+	GetHeader(hash common.Hash, number uint64) *types.Header
 	GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue
 }
 
@@ -24,22 +25,26 @@ func NewAccessorsChain(databaseConnection ethdb.Database) *AccessorsChain {
 	return &AccessorsChain{ethDbConnection: databaseConnection}
 }
 
-func (ldbr *AccessorsChain) GetBlock(hash common.Hash, number uint64) *types.Block {
-	return rawdb.ReadBlock(ldbr.ethDbConnection, hash, number)
+func (accessor *AccessorsChain) GetBlock(hash common.Hash, number uint64) *types.Block {
+	return rawdb.ReadBlock(accessor.ethDbConnection, hash, number)
 }
 
-func (ldbr *AccessorsChain) GetBlockReceipts(hash common.Hash, number uint64) types.Receipts {
-	return rawdb.ReadReceipts(ldbr.ethDbConnection, hash, number)
+func (accessor *AccessorsChain) GetBlockReceipts(hash common.Hash, number uint64) types.Receipts {
+	return rawdb.ReadReceipts(accessor.ethDbConnection, hash, number)
 }
 
-func (ldbr *AccessorsChain) GetBody(hash common.Hash, number uint64) *types.Body {
-	return rawdb.ReadBody(ldbr.ethDbConnection, hash, number)
+func (accessor *AccessorsChain) GetBody(hash common.Hash, number uint64) *types.Body {
+	return rawdb.ReadBody(accessor.ethDbConnection, hash, number)
 }
 
-func (ldbr *AccessorsChain) GetCanonicalHash(number uint64) common.Hash {
-	return rawdb.ReadCanonicalHash(ldbr.ethDbConnection, number)
+func (accessor *AccessorsChain) GetCanonicalHash(number uint64) common.Hash {
+	return rawdb.ReadCanonicalHash(accessor.ethDbConnection, number)
 }
 
-func (ldbr *AccessorsChain) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
-	return rawdb.ReadHeaderRLP(ldbr.ethDbConnection, hash, number)
+func (accessor *AccessorsChain) GetHeader(hash common.Hash, number uint64) *types.Header {
+	return rawdb.ReadHeader(accessor.ethDbConnection, hash, number)
+}
+
+func (accessor *AccessorsChain) GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue {
+	return rawdb.ReadHeaderRLP(accessor.ethDbConnection, hash, number)
 }
