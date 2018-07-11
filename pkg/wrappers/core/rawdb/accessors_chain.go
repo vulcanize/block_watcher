@@ -11,7 +11,7 @@ import (
 type IAccessorsChain interface {
 	GetBlock(hash common.Hash, number uint64) *types.Block
 	GetBlockReceipts(hash common.Hash, number uint64) types.Receipts
-	GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue
+	GetBody(hash common.Hash, number uint64) *types.Body
 	GetCanonicalHash(number uint64) common.Hash
 	GetHeaderRLP(hash common.Hash, number uint64) rlp.RawValue
 }
@@ -32,8 +32,8 @@ func (ldbr *AccessorsChain) GetBlockReceipts(hash common.Hash, number uint64) ty
 	return rawdb.ReadReceipts(ldbr.ethDbConnection, hash, number)
 }
 
-func (ldbr *AccessorsChain) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
-	return rawdb.ReadBodyRLP(ldbr.ethDbConnection, hash, number)
+func (ldbr *AccessorsChain) GetBody(hash common.Hash, number uint64) *types.Body {
+	return rawdb.ReadBody(ldbr.ethDbConnection, hash, number)
 }
 
 func (ldbr *AccessorsChain) GetCanonicalHash(number uint64) common.Hash {

@@ -23,7 +23,6 @@ import (
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_block_transactions"
 	"github.com/vulcanize/eth-block-extractor/pkg/transformers"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
 )
 
 // createIpldsForBlocksTransactionsCmd represents the createIpldsForBlocksTransactions command
@@ -59,8 +58,7 @@ func createIpldsForBlocksTransactions() {
 	if err != nil {
 		log.Fatal("Error connecting to IPFS: ", err)
 	}
-	decoder := rlp.RlpDecoder{}
-	dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(*ipfsNode, decoder)
+	dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(*ipfsNode)
 	publisher := ipfs.NewIpfsPublisher(dagPutter)
 
 	// execute transformer

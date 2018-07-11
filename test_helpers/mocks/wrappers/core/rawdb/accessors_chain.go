@@ -75,7 +75,7 @@ func (accessor *MockAccessorsChain) GetBlockReceipts(hash common.Hash, number ui
 	return nil
 }
 
-func (accessor *MockAccessorsChain) GetBodyRLP(hash common.Hash, number uint64) rlp.RawValue {
+func (accessor *MockAccessorsChain) GetBody(hash common.Hash, number uint64) *types.Body {
 	accessor.getBodyRLPPassedHash = hash
 	accessor.getBodyRLPPassedNumber = number
 	return nil

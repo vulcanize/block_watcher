@@ -24,10 +24,10 @@ func (db Database) ComputeBlockStateTrie(currentBlock *types.Block, parentBlock 
 	return db.stateComputer.ComputeBlockStateTrie(currentBlock, parentBlock)
 }
 
-func (db Database) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
+func (db Database) GetBlockBodyByBlockNumber(blockNumber int64) *types.Body {
 	n := uint64(blockNumber)
 	h := db.accessorsChain.GetCanonicalHash(n)
-	return db.accessorsChain.GetBodyRLP(h, n), nil
+	return db.accessorsChain.GetBody(h, n)
 }
 
 func (db Database) GetBlockByBlockNumber(blockNumber int64) *types.Block {

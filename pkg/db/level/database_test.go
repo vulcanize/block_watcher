@@ -44,9 +44,8 @@ var _ = Describe("Database", func() {
 			db := level.NewLevelDatabase(mockAccessorsChain, level_wrapper.NewMockStateComputer(), level_wrapper.NewMockStateTrieReader())
 			num := int64(123456)
 
-			_, err := db.GetBlockBodyByBlockNumber(num)
+			db.GetBlockBodyByBlockNumber(num)
 
-			Expect(err).NotTo(HaveOccurred())
 			mockAccessorsChain.AssertGetCanonicalHashCalledWith(uint64(num))
 		})
 
@@ -57,9 +56,8 @@ var _ = Describe("Database", func() {
 			db := level.NewLevelDatabase(mockAccessorsChain, level_wrapper.NewMockStateComputer(), level_wrapper.NewMockStateTrieReader())
 			num := int64(123456)
 
-			_, err := db.GetBlockBodyByBlockNumber(num)
+			db.GetBlockBodyByBlockNumber(num)
 
-			Expect(err).NotTo(HaveOccurred())
 			mockAccessorsChain.AssertGetBodyRLPCalledWith(hash, uint64(num))
 		})
 	})

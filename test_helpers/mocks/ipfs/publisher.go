@@ -1,6 +1,7 @@
 package ipfs
 
 import (
+	"github.com/ethereum/go-ethereum/core/types"
 	. "github.com/onsi/gomega"
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
 )
@@ -62,4 +63,12 @@ func (publisher *MockPublisher) AssertWriteCalledWithInterfaces(interfaces []int
 	for i := 0; i < len(publisher.passedBlockDatas); i++ {
 		Expect(interfaces).To(ContainElement(publisher.passedBlockDatas[i]))
 	}
+}
+
+func (publisher *MockPublisher) AssertWriteCalledWithBodies(bodies []*types.Body) {
+	var expected []*types.Body
+	for i := 0; i < len(publisher.passedBlockDatas); i++ {
+		expected = append(expected, publisher.passedBlockDatas[i].(*types.Body))
+	}
+	Expect(expected).To(Equal(bodies))
 }

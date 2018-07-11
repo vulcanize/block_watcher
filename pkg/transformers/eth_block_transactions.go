@@ -20,11 +20,8 @@ func (t EthBlockTransactionsTransformer) Execute(startingBlockNumber int64, endi
 		return ErrInvalidRange
 	}
 	for i := startingBlockNumber; i <= endingBlockNumber; i++ {
-		blockData, err := t.database.GetBlockBodyByBlockNumber(i)
-		if err != nil {
-			return NewExecuteError(GetBlockRlpErr, err)
-		}
-		res, err := t.publisher.Write(blockData)
+		body := t.database.GetBlockBodyByBlockNumber(i)
+		res, err := t.publisher.Write(body)
 		if err != nil {
 			return NewExecuteError(PutIpldErr, err)
 		}

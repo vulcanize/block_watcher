@@ -28,7 +28,7 @@ func (re ReadError) Error() string {
 type Database interface {
 	ComputeBlockStateTrie(currentBlock *types.Block, parentBlock *types.Block) (common.Hash, error)
 	GetBlockByBlockNumber(blockNumber int64) *types.Block
-	GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error)
+	GetBlockBodyByBlockNumber(blockNumber int64) *types.Body
 	GetBlockHeaderByBlockNumber(blockNumber int64) ([]byte, error)
 	GetBlockReceipts(blockNumber int64) types.Receipts
 	GetStateAndStorageTrieNodes(root common.Hash) (stateTrieNodes, storageTrieNodes [][]byte, err error)

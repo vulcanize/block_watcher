@@ -11,9 +11,8 @@ type MockDatabase struct {
 	computeBlockStateTriePassedCurrentBlock           *types.Block
 	computeBlockStateTriePassedParentBlock            *types.Block
 	computeBlockStateTrieReturnHash                   common.Hash
-	getBlockBodyByBlockNumberErr                      error
 	getBlockBodyByBlockNumberPassedBlockNumbers       []int64
-	getBlockBodyByBlockNumberReturnBytes              [][]byte
+	getBlockBodyByBlockNumberReturnBodies             []*types.Body
 	getBlockByBlockNumberPassedNumbers                []int64
 	getBlockByBlockNumberReturnBlock                  *types.Block
 	getBlockHeaderByBlockNumberErr                    error
@@ -33,9 +32,8 @@ func NewMockDatabase() *MockDatabase {
 		computeBlockStateTriePassedCurrentBlock:           nil,
 		computeBlockStateTriePassedParentBlock:            nil,
 		computeBlockStateTrieReturnHash:                   common.Hash{},
-		getBlockBodyByBlockNumberErr:                      nil,
 		getBlockBodyByBlockNumberPassedBlockNumbers:       nil,
-		getBlockBodyByBlockNumberReturnBytes:              nil,
+		getBlockBodyByBlockNumberReturnBodies:             nil,
 		getBlockByBlockNumberPassedNumbers:                nil,
 		getBlockByBlockNumberReturnBlock:                  nil,
 		getBlockHeaderByBlockNumberErr:                    nil,
@@ -58,12 +56,8 @@ func (db *MockDatabase) SetComputeBlockStateTrieReturnHash(hash common.Hash) {
 	db.computeBlockStateTrieReturnHash = hash
 }
 
-func (db *MockDatabase) SetGetBlockBodyByBlockNumberError(err error) {
-	db.getBlockBodyByBlockNumberErr = err
-}
-
-func (db *MockDatabase) SetGetBlockBodyByBlockNumberReturnBytes(returnBytes [][]byte) {
-	db.getBlockBodyByBlockNumberReturnBytes = returnBytes
+func (db *MockDatabase) SetGetBlockBodyByBlockNumberReturnBody(bodies []*types.Body) {
+	db.getBlockBodyByBlockNumberReturnBodies = bodies
 }
 
 func (db *MockDatabase) SetGetBlockByBlockNumberReturnBlock(returnBlock *types.Block) {
@@ -100,14 +94,11 @@ func (db *MockDatabase) ComputeBlockStateTrie(currentBlock *types.Block, parentB
 	return db.computeBlockStateTrieReturnHash, db.computeBlockStateTrieErr
 }
 
-func (db *MockDatabase) GetBlockBodyByBlockNumber(blockNumber int64) ([]byte, error) {
+func (db *MockDatabase) GetBlockBodyByBlockNumber(blockNumber int64) *types.Body {
 	db.getBlockBodyByBlockNumberPassedBlockNumbers = append(db.getBlockBodyByBlockNumberPassedBlockNumbers, blockNumber)
-	if db.getBlockBodyByBlockNumberErr != nil {
-		return nil, db.getBlockBodyByBlockNumberErr
-	}
-	returnBytes := db.getBlockBodyByBlockNumberReturnBytes[0]
-	db.getBlockBodyByBlockNumberReturnBytes = db.getBlockBodyByBlockNumberReturnBytes[1:]
-	return returnBytes, nil
+	returnBytes := db.getBlockBodyByBlockNumberReturnBodies[0]
+	db.getBlockBodyByBlockNumberReturnBodies = db.getBlockBodyByBlockNumberReturnBodies[1:]
+	return returnBytes
 }
 
 func (db *MockDatabase) GetBlockByBlockNumber(blockNumber int64) *types.Block {
