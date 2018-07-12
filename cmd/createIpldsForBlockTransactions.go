@@ -58,7 +58,7 @@ func createIpldsForBlockTransactions() {
 		log.Fatal("Error connecting to IPFS: ", err)
 	}
 	dagPutter := eth_block_transactions.NewBlockTransactionsDagPutter(*ipfsNode)
-	publisher := ipfs.NewIpfsPublisher(dagPutter)
+	publisher := ipfs.NewIpldPublisher(dagPutter)
 
 	// execute transformer
 	transformer := transformers.NewEthBlockTransactionsTransformer(ethDB, publisher)

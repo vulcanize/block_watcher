@@ -6,8 +6,8 @@ import (
 	"github.com/vulcanize/eth-block-extractor/pkg/db/level"
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
 	level_wrapper "github.com/vulcanize/eth-block-extractor/test_helpers/mocks/db/level"
-	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/core/state"
-	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/trie"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/go-ethereum/core/state"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/go-ethereum/trie"
 )
 
 var _ = Describe("State trie reader", func() {

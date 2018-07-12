@@ -6,16 +6,14 @@ import (
 	"github.com/ipfs/go-ipfs/core"
 	"github.com/ipfs/go-ipfs/repo/fsrepo"
 
-	ipld "gx/ipfs/QmWi2BYBL5gJ3CiAiQchg6rn1A8iBsrWy51EYxvHVjFvLb/go-ipld-format"
+	"gx/ipfs/QmTRCUvZLiir12Qr6MV3HKfKMHX8Nf1Vddn6t2g5nsQSb9/go-block-format"
+	"gx/ipfs/QmWi2BYBL5gJ3CiAiQchg6rn1A8iBsrWy51EYxvHVjFvLb/go-ipld-format"
+	"gx/ipfs/QmapdYm1b22Frv3k17fqrBYTFRxwiaVJkB299Mfn33edeB/go-cid"
 )
 
 type IPFS struct {
 	n   *core.IpfsNode
 	ctx context.Context
-}
-
-func (ipfs IPFS) Add(node ipld.Node) error {
-	return ipfs.n.DAG.Add(ipfs.n.Context(), node)
 }
 
 func InitIPFSNode(repoPath string) (*IPFS, error) {
@@ -33,4 +31,12 @@ func InitIPFSNode(repoPath string) (*IPFS, error) {
 		return nil, err
 	}
 	return &IPFS{n: ipfsNode, ctx: ctx}, nil
+}
+
+func (ipfs IPFS) Add(node format.Node) error {
+	return ipfs.n.DAG.Add(ipfs.n.Context(), node)
+}
+
+func (ipfs IPFS) Get(cid *cid.Cid) (blocks.Block, error) {
+	return ipfs.n.Blocks.GetBlock(context.Background(), cid)
 }

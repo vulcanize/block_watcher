@@ -2,7 +2,7 @@ package level
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/core/state"
 )
 
 type IStateTrieReader interface {

@@ -3,8 +3,8 @@ package level
 import (
 	"bytes"
 	"github.com/ethereum/go-ethereum/core/state"
-	state_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
+	state_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/core/state"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/rlp"
 )
 
 var EmptyStorageTrieRoot = []byte{86, 232, 31, 23, 27, 204, 85, 166, 255, 131, 69, 230, 146, 192, 248, 110, 91, 72, 224, 27, 153, 108, 173, 192, 1, 98, 47, 181, 227, 99, 180, 33}

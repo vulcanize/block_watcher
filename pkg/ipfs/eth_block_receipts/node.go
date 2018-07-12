@@ -1,11 +1,14 @@
 package eth_block_receipts
 
 import (
+	"github.com/ethereum/go-ethereum/core/types"
 	"gx/ipfs/QmWi2BYBL5gJ3CiAiQchg6rn1A8iBsrWy51EYxvHVjFvLb/go-ipld-format"
 	"gx/ipfs/QmapdYm1b22Frv3k17fqrBYTFRxwiaVJkB299Mfn33edeB/go-cid"
 )
 
 type EthReceiptNode struct {
+	*types.Receipt
+
 	raw []byte
 	cid *cid.Cid
 }

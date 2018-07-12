@@ -8,10 +8,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/vulcanize/eth-block-extractor/pkg/db/level"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/rawdb"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/core"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/core/rawdb"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/core/state"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/rlp"
 )
 
 var ErrNoSuchDb = errors.New("no such database")

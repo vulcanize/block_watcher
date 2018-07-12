@@ -6,7 +6,7 @@ import (
 
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/util"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/rlp"
 )
 
 const (

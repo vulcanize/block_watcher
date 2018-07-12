@@ -23,7 +23,7 @@ import (
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_block_header"
 	"github.com/vulcanize/eth-block-extractor/pkg/transformers"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/rlp"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/rlp"
 )
 
 // createIpldForBlockHeaderCmd represents the createIpldForBlockHeader command
@@ -61,7 +61,7 @@ func createIpldForBlockHeader() {
 	}
 	decoder := rlp.RlpDecoder{}
 	dagPutter := eth_block_header.NewBlockHeaderDagPutter(*ipfsNode, decoder)
-	publisher := ipfs.NewIpfsPublisher(dagPutter)
+	publisher := ipfs.NewIpldPublisher(dagPutter)
 
 	// execute transformer
 	transformer := transformers.NewEthBlockHeaderTransformer(ethDB, publisher)

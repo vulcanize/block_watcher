@@ -12,7 +12,6 @@ import (
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/db"
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
-	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/rlp"
 )
 
 var _ = Describe("Eth state trie transformer", func() {
@@ -68,8 +67,6 @@ var _ = Describe("Eth state trie transformer", func() {
 		mockDB.SetGetBlockHeaderByBlockNumberReturnHeader(&types.Header{})
 		fakeStateTrieNodes := [][]byte{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 0}}
 		mockDB.SetGetStateAndStorageTrieNodesReturnStateTrieBytes(fakeStateTrieNodes)
-		mockDecoder := rlp.NewMockDecoder()
-		mockDecoder.SetReturnOut(&types.Header{})
 		mockStateTriePublisher := ipfs.NewMockPublisher()
 		mockStateTriePublisher.SetReturnStrings([][]string{{"one"}, {"two"}})
 		transformer := transformers.NewEthStateTrieTransformer(mockDB, mockStateTriePublisher, ipfs.NewMockPublisher())
@@ -85,8 +82,6 @@ var _ = Describe("Eth state trie transformer", func() {
 		mockDB.SetGetBlockHeaderByBlockNumberReturnHeader(&types.Header{})
 		fakeStateTrieNodes := [][]byte{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 0}}
 		mockDB.SetGetStateAndStorageTrieNodesReturnStorageTrieBytes(fakeStateTrieNodes)
-		mockDecoder := rlp.NewMockDecoder()
-		mockDecoder.SetReturnOut(&types.Header{})
 		mockStorageTriePublisher := ipfs.NewMockPublisher()
 		mockStorageTriePublisher.SetReturnStrings([][]string{{"one"}, {"two"}})
 		transformer := transformers.NewEthStateTrieTransformer(mockDB, ipfs.NewMockPublisher(), mockStorageTriePublisher)

@@ -7,9 +7,9 @@ import (
 
 	"github.com/vulcanize/eth-block-extractor/pkg/db/level"
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
-	state_wrapper "github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/core/state"
-	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/rlp"
-	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/trie"
+	state_wrapper "github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/go-ethereum/core/state"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/go-ethereum/rlp"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/go-ethereum/trie"
 )
 
 var _ = Describe("Storage trie reader", func() {

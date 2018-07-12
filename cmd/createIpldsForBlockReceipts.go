@@ -56,7 +56,7 @@ func createBlockReceipts() {
 		log.Fatal("Error connecting to IPFS: ", err)
 	}
 	dagPutter := eth_block_receipts.NewEthBlockReceiptDagPutter(ipfsNode)
-	publisher := ipfs.NewIpfsPublisher(dagPutter)
+	publisher := ipfs.NewIpldPublisher(dagPutter)
 
 	// execute transformer
 	transformer := transformers.NewEthBlockReceiptTransformer(ethDB, publisher)

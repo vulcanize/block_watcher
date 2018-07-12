@@ -67,9 +67,9 @@ func createIpldsForStateTrie() {
 		log.Fatal("Error connecting to ipfs: ", err)
 	}
 	stateTrieDagPutter := eth_state_trie.NewStateTrieDagPutter(adder)
-	stateTriePublisher := ipfs.NewIpfsPublisher(stateTrieDagPutter)
+	stateTriePublisher := ipfs.NewIpldPublisher(stateTrieDagPutter)
 	storageTrieDagPutter := eth_storage_trie.NewStorageTrieDagPutter(adder)
-	storageTriePublisher := ipfs.NewIpfsPublisher(storageTrieDagPutter)
+	storageTriePublisher := ipfs.NewIpldPublisher(storageTrieDagPutter)
 
 	// init and execute transformer
 	if computeState {

@@ -8,13 +8,12 @@ import (
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs/eth_block_header"
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
 	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
-	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/rlp"
+	"github.com/vulcanize/eth-block-extractor/test_helpers/mocks/wrappers/go-ethereum/rlp"
 )
 
 var _ = Describe("Creating an IPLD for a block header", func() {
 	It("decodes passed bytes into ethereum block header", func() {
 		mockDecoder := rlp.NewMockDecoder()
-		mockDecoder.SetReturnOut(&types.Header{})
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(ipfs.NewMockAdder(), mockDecoder)
 		fakeBytes := []byte{1, 2, 3, 4, 5}
 
@@ -26,7 +25,6 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 
 	It("returns error if decoding fails", func() {
 		mockDecoder := rlp.NewMockDecoder()
-		mockDecoder.SetReturnOut(&types.Header{})
 		mockDecoder.SetError(test_helpers.FakeError)
 		dagPutter := eth_block_header.NewBlockHeaderDagPutter(ipfs.NewMockAdder(), mockDecoder)
 
@@ -38,9 +36,7 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 
 	It("adds ethereum block header to ipfs", func() {
 		mockAdder := ipfs.NewMockAdder()
-		mockDecoder := rlp.NewMockDecoder()
-		mockDecoder.SetReturnOut(&types.Header{})
-		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, mockDecoder)
+		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, rlp.NewMockDecoder())
 		fakeBytes := []byte{1, 2, 3, 4, 5}
 
 		_, err := dagPutter.DagPut(fakeBytes)
@@ -52,9 +48,7 @@ var _ = Describe("Creating an IPLD for a block header", func() {
 	It("returns error if adding to ipfs fails", func() {
 		mockAdder := ipfs.NewMockAdder()
 		mockAdder.SetError(test_helpers.FakeError)
-		mockDecoder := rlp.NewMockDecoder()
-		mockDecoder.SetReturnOut(&types.Header{})
-		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, mockDecoder)
+		dagPutter := eth_block_header.NewBlockHeaderDagPutter(mockAdder, rlp.NewMockDecoder())
 
 		_, err := dagPutter.DagPut([]byte{1, 2, 3, 4, 5})
 

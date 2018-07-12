@@ -5,8 +5,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/trie"
-	state_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
-	trie_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/trie"
+	state_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/core/state"
+	trie_wrapper "github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/trie"
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
 )
 

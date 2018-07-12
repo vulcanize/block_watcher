@@ -3,8 +3,8 @@ package level
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/core/state"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/core"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/core/state"
 )
 
 type IStateComputer interface {

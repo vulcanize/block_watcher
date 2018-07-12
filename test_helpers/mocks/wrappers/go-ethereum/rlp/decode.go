@@ -35,8 +35,10 @@ func (md *MockDecoder) Decode(raw []byte, out interface{}) error {
 	md.called = true
 	md.passedBytes = raw
 	md.passedOut = out
-	valToAssign := reflect.ValueOf(md.returnOut).Elem()
-	reflect.ValueOf(out).Elem().Set(valToAssign)
+	if md.returnOut != nil {
+		valToAssign := reflect.ValueOf(md.returnOut).Elem()
+		reflect.ValueOf(out).Elem().Set(valToAssign)
+	}
 	return md.err
 }
 

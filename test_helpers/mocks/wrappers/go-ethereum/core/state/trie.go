@@ -1,7 +1,7 @@
 package state
 
 import (
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/trie"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/trie"
 )
 
 type MockTrie struct {

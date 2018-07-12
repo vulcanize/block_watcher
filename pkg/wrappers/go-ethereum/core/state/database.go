@@ -4,7 +4,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/trie"
+	"github.com/vulcanize/eth-block-extractor/pkg/wrappers/go-ethereum/trie"
 )
 
 type GethStateDatabase interface {

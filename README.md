@@ -70,6 +70,13 @@ A [VulcanizeDB](https://github.com/vulcanize/VulcanizeDB) transformer for creati
   - Computing state requires beginning at the genesis block, so starting block number flag is ignored if not 0.
   - Ending block number must be greater than starting block number.
 
+## Running the getIpld command
+- This command fetches the IPLD associated with a CID and logs a JSON marshaled version of the data to the console.
+- `./eth-block-extractor getIpld --config <config.toml> --cid <cid>`
+- Note:
+  - cid flag is required to specify what data to lookup.
+  - currently only supports cids corresponding to blocks, transactions, or receipts.
+
 ## Running the tests
 ```
 ginkgo -r

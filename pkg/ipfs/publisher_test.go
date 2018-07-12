@@ -5,13 +5,13 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/vulcanize/eth-block-extractor/pkg/ipfs"
 	"github.com/vulcanize/eth-block-extractor/test_helpers"
-	ipfs_wrapper "github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
+	ipfs_mocks "github.com/vulcanize/eth-block-extractor/test_helpers/mocks/ipfs"
 )
 
-var _ = Describe("IPFS publisher", func() {
+var _ = Describe("IPLD publisher", func() {
 	It("calls dag put with the passed data", func() {
-		mockDagPutter := ipfs_wrapper.NewMockDagPutter()
-		publisher := ipfs.NewIpfsPublisher(mockDagPutter)
+		mockDagPutter := ipfs_mocks.NewMockDagPutter()
+		publisher := ipfs.NewIpldPublisher(mockDagPutter)
 		fakeBytes := []byte{1, 2, 3, 4, 5}
 
 		_, err := publisher.DagPut(fakeBytes)
@@ -22,9 +22,9 @@ var _ = Describe("IPFS publisher", func() {
 	})
 
 	It("returns error if dag put fails", func() {
-		mockDagPutter := ipfs_wrapper.NewMockDagPutter()
+		mockDagPutter := ipfs_mocks.NewMockDagPutter()
 		mockDagPutter.SetError(test_helpers.FakeError)
-		publisher := ipfs.NewIpfsPublisher(mockDagPutter)
+		publisher := ipfs.NewIpldPublisher(mockDagPutter)
 
 		_, err := publisher.DagPut([]byte{1, 2, 3, 4, 5})
 
